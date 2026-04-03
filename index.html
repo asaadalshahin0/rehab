@@ -19,6 +19,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 @keyframes burst{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.5}}
 input[type=range]{-webkit-appearance:none;appearance:none;background:rgba(255,255,255,0.06);border-radius:3px;outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;cursor:pointer}
 textarea{font-family:'Outfit',sans-serif}
@@ -32,156 +33,154 @@ textarea{font-family:'Outfit',sans-serif}
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel" data-type="module">
-const {useState,useEffect,useCallback} = React;
+const {useState,useEffect,useCallback,useRef} = React;
 
 const SESSIONS_TO_UNLOCK = 7;
 const DAILY_PAIN_THRESHOLD = 3;
+const DEFAULT_REST = 60;
 const TODAY = () => new Date().toISOString().split("T")[0];
 const pr = (ok, stop) => ({ok, stop});
 
 const KNEE_PHASES = [
-  {
-    id:1,name:"Isometric Foundation",
-    freq:"Daily is fine — isometrics are low-stress on the tendon.",
-    rationale:"Isometrics reduce tendon pain acutely and build baseline capacity without aggravating the tendon. You've had this 10 years — we're not rushing.",
-    warmup:"2-3 min easy walking or marching in place. Get blood flowing to the knee.",
-    exercises:[
-      {name:"Wall Sit",sets:3,duration:45,unit:"sec",notes:"Back flat, knees ~70-80°. Adjust depth to manage pain.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce knee bend angle next time.")},
-      {name:"Couch Stretch",sets:2,duration:45,unit:"sec/side",notes:"Rear foot elevated, squeeze glute on stretch side.",pain:pr("0-2/10 stretch sensation","Stop if sharp pain. Back off depth.")},
-      {name:"Glute Bridge",sets:2,reps:12,holdSec:2,unit:"reps",notes:"2-sec squeeze at top. Glutes protect the knee.",pain:pr("0-1/10 in knee","Should be pain-free. If knee hurts, check foot placement.")},
-      {name:"Mini Squat",sets:1,reps:5,unit:"reps",notes:"Barely a quarter squat. This is a pain probe, not a workout.",pain:pr("0-2/10 max","Stop the rep immediately at 2/10. Come back up. That's your current depth limit.")},
-    ],
-  },
-  {
-    id:2,name:"Heavy Slow Resistance",
-    freq:"Every other day recommended. Tendons need 24-36hrs to adapt to heavier loads.",
-    rationale:"HSR is the gold standard for chronic patellar tendinopathy. Slow tempo, heavier loads, building the tendon's capacity to handle force.",
-    warmup:"3 min easy walking + 10 bodyweight mini squats to warm the joint.",
-    exercises:[
-      {name:"Spanish Squat (Iso Hold)",sets:3,duration:30,unit:"sec",notes:"NEW — Band behind knees, lean back, hold. The money exercise for patellar tendons.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce depth or lean angle.")},
-      {name:"Leg Extension (Slow)",sets:3,reps:8,unit:"reps",notes:"NEW — 3-sec up, 3-sec down. Light weight. Use ankle weight or band if no machine.",pain:pr("0-3/10 in tendon","Stop set if >4. Drop weight next time. Tendon should feel loaded, not sharp.")},
-      {name:"Wall Sit",sets:3,duration:60,unit:"sec",notes:"Progressed from 45s.",pain:pr("0-4/10 acceptable","Stop set if >4. Drop back to 45s if needed.")},
-      {name:"Glute Bridge",sets:3,reps:15,holdSec:3,unit:"reps",notes:"Added set, reps, and hold time.",pain:pr("0-1/10 in knee","Should be pain-free. Stop if knee hurts.")},
-      {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",notes:"Progressed from 45s.",pain:pr("0-2/10 stretch sensation","Stop if sharp. Back off depth.")},
-      {name:"Half Squat",sets:2,reps:8,unit:"reps",notes:"Upgraded from mini squat — ~45° knee bend. 3-sec lower.",pain:pr("0-3/10 during movement","Stop the rep at 3/10. That's your depth limit for now.")},
-    ],
-  },
-  {
-    id:3,name:"Single-Leg Loading",
-    freq:"Every other day. Single-leg work is demanding — recovery matters.",
-    rationale:"Your right knee needs to handle load independently. Single-leg work exposes asymmetries and builds real-world tendon resilience.",
-    warmup:"3 min walking + 10 half squats + 30-sec wall sit to prime the tendon.",
-    exercises:[
-      {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",notes:"Progressed from 30s.",pain:pr("0-4/10 acceptable","Stop set if >4.")},
-      {name:"Decline Single-Leg Squat",sets:3,reps:8,unit:"reps",notes:"NEW — Slant board or wedge under heels. Slow 4-sec lower on right leg, push up with both.",pain:pr("0-4/10 during eccentric","Stop if >4 or if pain is sharp rather than dull.")},
-      {name:"Step-Up",sets:3,reps:10,unit:"reps/side",notes:"NEW — Low box (6-8 in). Controlled descent. Lead with right leg.",pain:pr("0-3/10 in knee","Stop if >3. Lower the box height.")},
-      {name:"Leg Extension (Slow)",sets:3,reps:10,unit:"reps",notes:"Increase weight. Same slow tempo.",pain:pr("0-3/10 in tendon","Stop if >4. Drop weight.")},
-      {name:"Single-Leg Glute Bridge",sets:2,reps:10,unit:"reps/side",notes:"NEW — Progressed from bilateral.",pain:pr("0-1/10 in knee","Should be pain-free.")},
-      {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",notes:"Maintain.",pain:pr("0-2/10 stretch","Stop if sharp.")},
-    ],
-  },
-  {
-    id:4,name:"Energy Storage & Return",
-    freq:"Every other day for plyometrics. Strength work can be daily if tolerated.",
-    rationale:"The patellar tendon's real job is absorbing and releasing energy. This phase rebuilds that capacity so you can return to full activity.",
-    warmup:"5 min progressive: walk → light jog in place → 10 half squats → 10 calf raises.",
-    exercises:[
-      {name:"Split Squat",sets:3,reps:10,unit:"reps/side",notes:"NEW — Full depth if pain-free. Add dumbbells when ready.",pain:pr("0-3/10 during movement","Stop if >3. Reduce depth or drop weight.")},
-      {name:"Decline Single-Leg Squat",sets:3,reps:10,unit:"reps",notes:"Add light weight if tolerated.",pain:pr("0-4/10 during eccentric","Stop if >4.")},
-      {name:"Double-Leg Pogo Hops",sets:2,reps:15,unit:"reps",notes:"NEW — Small, quick bounces. Stiff ankle. Plyometric intro.",pain:pr("0-2/10 only","Stop immediately if >2. Plyometrics must be near pain-free.")},
-      {name:"Step-Down (Controlled)",sets:3,reps:8,unit:"reps/side",notes:"NEW — Higher box (8-12 in). Slow lower, tap floor, push back up.",pain:pr("0-3/10 during movement","Stop if >3. Lower the box.")},
-      {name:"Lateral Band Walk",sets:2,reps:12,unit:"steps/dir",notes:"NEW — Hip stability for knee tracking under load.",pain:pr("0-1/10 in knee","Should be pain-free. If knee tracks inward, lighter band.")},
-      {name:"Single-Leg Calf Raise",sets:3,reps:12,unit:"reps/side",notes:"NEW — Calf-Achilles complex supports patellar tendon function.",pain:pr("0-1/10 in knee","Calf burn is fine. Knee pain is not — stop if present.")},
-    ],
-  },
-  {
-    id:5,name:"Bulletproofing",
-    freq:"2-3x per week indefinitely. This is your new normal — not a phase to finish, but a practice to keep.",
-    rationale:"You're not 'done' — you're managing a tendon that took 10 years to get here. This phase is about maintaining what you've built, staying ahead of flare-ups, and having a clear protocol for when pain creeps back. Think of this as brushing your teeth for your knee.",
-    warmup:"5 min progressive: walk → jog → 10 squats → 10 pogo hops → dynamic stretching.",
-    exercises:[
-      {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",notes:"Your maintenance staple. Keep this forever.",pain:pr("0-2/10","If this starts hurting >2, that's your early warning. Drop back to Phase 3 for a week.")},
-      {name:"Split Squat (Weighted)",sets:3,reps:10,unit:"reps/side",notes:"Dumbbells or barbell. Progressive overload — keep adding weight over months.",pain:pr("0-2/10 in tendon","Stop if >2. If consistently painful, drop weight 20% and rebuild.")},
-      {name:"Single-Leg Pogo Hops",sets:2,reps:10,unit:"reps/side",notes:"NEW — Progressed from double-leg. The ultimate patellar tendon stress test.",pain:pr("0-1/10 only","Must be essentially pain-free. Any pain = not ready. Go back to double-leg.")},
-      {name:"Drop Jump (Low Box)",sets:2,reps:6,unit:"reps",notes:"NEW — Step off 6-8 in box, land on both feet, immediately jump up. Reactive strength.",pain:pr("0-1/10 on landing","Stop immediately if any tendon pain on landing.")},
-      {name:"Lateral Lunge",sets:2,reps:8,unit:"reps/side",notes:"NEW — Trains the tendon in a different plane. Real life isn't just forward/back.",pain:pr("0-2/10","Stop if >2. Reduce depth.")},
-      {name:"Single-Leg Calf Raise",sets:3,reps:15,unit:"reps/side",notes:"Progressed reps. Add weight when bodyweight is easy.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
-    ],
-    flareProtocol:"IF PAIN RETURNS: Don't panic. Drop all plyometrics immediately. Go back to Spanish Squat isometrics 2x daily for 5-7 days. If daily-life pain drops below 2/10, resume this phase. If it doesn't improve in 2 weeks, drop back to Phase 3 and work forward again. This is normal — tendons flare. It doesn't mean you lost your progress.",
-  },
+  {id:1,name:"Isometric Foundation",freq:"Daily is fine — isometrics are low-stress on the tendon.",rationale:"Isometrics reduce tendon pain acutely and build baseline capacity without aggravating the tendon. You've had this 10 years — we're not rushing.",warmup:"2-3 min easy walking or marching in place. Get blood flowing to the knee.",exercises:[
+    {name:"Wall Sit",sets:3,duration:45,unit:"sec",rest:60,notes:"Back flat, knees ~70-80°. Adjust depth to manage pain.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce knee bend angle next time.")},
+    {name:"Couch Stretch",sets:2,duration:45,unit:"sec/side",rest:30,notes:"Rear foot elevated, squeeze glute on stretch side.",pain:pr("0-2/10 stretch sensation","Stop if sharp pain. Back off depth.")},
+    {name:"Glute Bridge",sets:2,reps:12,holdSec:2,unit:"reps",rest:60,notes:"2-sec squeeze at top. Glutes protect the knee.",pain:pr("0-1/10 in knee","Should be pain-free. If knee hurts, check foot placement.")},
+    {name:"Mini Squat",sets:1,reps:5,unit:"reps",rest:0,notes:"Barely a quarter squat. This is a pain probe, not a workout.",pain:pr("0-2/10 max","Stop the rep immediately at 2/10. Come back up.")},
+  ]},
+  {id:2,name:"Heavy Slow Resistance",freq:"Every other day recommended. Tendons need 24-36hrs to adapt.",rationale:"HSR is the gold standard for chronic patellar tendinopathy. Slow tempo, heavier loads, building tendon capacity.",warmup:"3 min easy walking + 10 bodyweight mini squats to warm the joint.",exercises:[
+    {name:"Spanish Squat (Iso Hold)",sets:3,duration:30,unit:"sec",rest:60,notes:"NEW — Band behind knees, lean back, hold. The money exercise for patellar tendons.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce depth or lean angle.")},
+    {name:"Leg Extension (Slow)",sets:3,reps:8,unit:"reps",rest:90,notes:"NEW — 3-sec up, 3-sec down. Light weight. Use ankle weight or band if no machine.",pain:pr("0-3/10 in tendon","Stop set if >4. Drop weight next time.")},
+    {name:"Wall Sit",sets:3,duration:60,unit:"sec",rest:60,notes:"Progressed from 45s.",pain:pr("0-4/10 acceptable","Stop set if >4. Drop back to 45s if needed.")},
+    {name:"Glute Bridge",sets:3,reps:15,holdSec:3,unit:"reps",rest:60,notes:"Added set, reps, and hold time.",pain:pr("0-1/10 in knee","Should be pain-free. Stop if knee hurts.")},
+    {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",rest:30,notes:"Progressed from 45s.",pain:pr("0-2/10 stretch sensation","Stop if sharp. Back off depth.")},
+    {name:"Half Squat",sets:2,reps:8,unit:"reps",rest:90,notes:"Upgraded from mini squat — ~45° knee bend. 3-sec lower.",pain:pr("0-3/10 during movement","Stop the rep at 3/10.")},
+  ]},
+  {id:3,name:"Single-Leg Loading",freq:"Every other day. Single-leg work is demanding — recovery matters.",rationale:"Your right knee needs to handle load independently. Single-leg work exposes asymmetries and builds real-world tendon resilience.",warmup:"3 min walking + 10 half squats + 30-sec wall sit to prime the tendon.",exercises:[
+    {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",rest:60,notes:"Progressed from 30s.",pain:pr("0-4/10 acceptable","Stop set if >4.")},
+    {name:"Decline Single-Leg Squat",sets:3,reps:8,unit:"reps",rest:90,notes:"NEW — Slant board or wedge under heels. Slow 4-sec lower on right leg, push up with both.",pain:pr("0-4/10 during eccentric","Stop if >4 or if pain is sharp rather than dull.")},
+    {name:"Step-Up",sets:3,reps:10,unit:"reps/side",rest:60,notes:"NEW — Low box (6-8 in). Controlled descent. Lead with right leg.",pain:pr("0-3/10 in knee","Stop if >3. Lower the box height.")},
+    {name:"Leg Extension (Slow)",sets:3,reps:10,unit:"reps",rest:90,notes:"Increase weight. Same slow tempo.",pain:pr("0-3/10 in tendon","Stop if >4. Drop weight.")},
+    {name:"Single-Leg Glute Bridge",sets:2,reps:10,unit:"reps/side",rest:60,notes:"NEW — Progressed from bilateral.",pain:pr("0-1/10 in knee","Should be pain-free.")},
+    {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",rest:30,notes:"Maintain.",pain:pr("0-2/10 stretch","Stop if sharp.")},
+  ]},
+  {id:4,name:"Energy Storage & Return",freq:"Every other day for plyometrics. Strength work can be daily if tolerated.",rationale:"The patellar tendon's real job is absorbing and releasing energy. This phase rebuilds that capacity.",warmup:"5 min progressive: walk → light jog in place → 10 half squats → 10 calf raises.",exercises:[
+    {name:"Split Squat",sets:3,reps:10,unit:"reps/side",rest:90,notes:"NEW — Full depth if pain-free. Add dumbbells when ready.",pain:pr("0-3/10 during movement","Stop if >3. Reduce depth or drop weight.")},
+    {name:"Decline Single-Leg Squat",sets:3,reps:10,unit:"reps",rest:90,notes:"Add light weight if tolerated.",pain:pr("0-4/10 during eccentric","Stop if >4.")},
+    {name:"Double-Leg Pogo Hops",sets:2,reps:15,unit:"reps",rest:60,notes:"NEW — Small, quick bounces. Stiff ankle. Plyometric intro.",pain:pr("0-2/10 only","Stop immediately if >2. Plyometrics must be near pain-free.")},
+    {name:"Step-Down (Controlled)",sets:3,reps:8,unit:"reps/side",rest:60,notes:"NEW — Higher box (8-12 in). Slow lower, tap floor, push back up.",pain:pr("0-3/10 during movement","Stop if >3. Lower the box.")},
+    {name:"Lateral Band Walk",sets:2,reps:12,unit:"steps/dir",rest:45,notes:"NEW — Hip stability for knee tracking under load.",pain:pr("0-1/10 in knee","Should be pain-free.")},
+    {name:"Single-Leg Calf Raise",sets:3,reps:12,unit:"reps/side",rest:45,notes:"NEW — Calf-Achilles complex supports patellar tendon function.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
+  ]},
+  {id:5,name:"Bulletproofing",freq:"2-3x per week indefinitely. This is your new normal.",rationale:"You're not 'done' — you're managing a tendon that took 10 years to get here. Think of this as brushing your teeth for your knee.",warmup:"5 min progressive: walk → jog → 10 squats → 10 pogo hops → dynamic stretching.",exercises:[
+    {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",rest:60,notes:"Your maintenance staple. Keep this forever.",pain:pr("0-2/10","If >2, that's your early warning. Drop back to Phase 3 for a week.")},
+    {name:"Split Squat (Weighted)",sets:3,reps:10,unit:"reps/side",rest:90,notes:"Dumbbells or barbell. Progressive overload over months.",pain:pr("0-2/10 in tendon","Stop if >2. Drop weight 20% and rebuild.")},
+    {name:"Single-Leg Pogo Hops",sets:2,reps:10,unit:"reps/side",rest:60,notes:"NEW — The ultimate patellar tendon stress test.",pain:pr("0-1/10 only","Any pain = not ready. Go back to double-leg.")},
+    {name:"Drop Jump (Low Box)",sets:2,reps:6,unit:"reps",rest:90,notes:"NEW — Step off 6-8 in box, land, immediately jump up.",pain:pr("0-1/10 on landing","Stop immediately if any tendon pain on landing.")},
+    {name:"Lateral Lunge",sets:2,reps:8,unit:"reps/side",rest:60,notes:"NEW — Trains the tendon in a different plane.",pain:pr("0-2/10","Stop if >2. Reduce depth.")},
+    {name:"Single-Leg Calf Raise",sets:3,reps:15,unit:"reps/side",rest:45,notes:"Add weight when bodyweight is easy.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
+  ],flareProtocol:"IF PAIN RETURNS: Drop all plyometrics. Spanish Squat isometrics 2x daily for 5-7 days. If daily pain drops below 2/10, resume. If not better in 2 weeks, drop back to Phase 3."},
 ];
 
 const ELBOW_PHASES = [
-  {
-    id:1,name:"Pain Reduction",
-    freq:"Daily is fine — eccentrics and isometrics are low-dose.",
-    rationale:"Eccentrics and isometrics to calm the tendon down and start building load tolerance. This came from impact so we're being careful.",
-    warmup:"1-2 min wrist circles (both directions) + open/close fist 20 times.",
-    exercises:[
-      {name:"Wrist Flexion Eccentric",sets:2,reps:10,unit:"reps",notes:"5lb — Lift with left hand, lower slowly over 5 sec with right.",pain:pr("0-4/10 during lowering","Stop if >4 or if pain is sharp on the inside of the elbow. Drop to 3lb.")},
-      {name:"Isometric Wrist Flexion Hold",sets:3,duration:25,restSec:45,unit:"sec",notes:"Palm up, hold weight dead still. 45-sec rest between sets.",pain:pr("0-3/10 acceptable","Stop set if >3. Drop weight or shorten hold.")},
-    ],
-  },
-  {
-    id:2,name:"Load Tolerance",
-    freq:"Daily for isometrics. Eccentric/curl work every other day.",
-    rationale:"Increasing weight, adding volume, introducing wrist extensors.",
-    warmup:"1-2 min wrist circles + 10 light fist squeezes + 10 finger spreads.",
-    exercises:[
-      {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",notes:"Progress to 7.5lb when 5lb feels easy.",pain:pr("0-4/10 during lowering","Stop if >4. Stay at current weight longer.")},
-      {name:"Isometric Wrist Flexion Hold",sets:3,duration:35,restSec:45,unit:"sec",notes:"Progressed from 25s.",pain:pr("0-3/10 acceptable","Stop if >3. Drop back to 25s.")},
-      {name:"Reverse Wrist Curl",sets:2,reps:12,unit:"reps",notes:"NEW — 3-5lb, palm down, slow lower.",pain:pr("0-2/10 in elbow","Stop if any medial elbow pain.")},
-      {name:"Finger Extension (Band)",sets:2,reps:15,unit:"reps",notes:"NEW — Band around all 5 fingers, spread apart.",pain:pr("0-1/10","Should be pain-free. Lighter band if painful.")},
-    ],
-  },
-  {
-    id:3,name:"Grip & Rotation",
-    freq:"Every other day. Grip work taxes the tendon — rest between sessions.",
-    rationale:"Your elbow needs to handle gripping, twisting, and sustained holds before we return to impact.",
-    warmup:"2 min wrist circles + light grip squeezes + 10 pronation/supination with no weight.",
-    exercises:[
-      {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",notes:"Progress to 10lb.",pain:pr("0-4/10 during lowering","Stop if >4.")},
-      {name:"Tyler Twist (FlexBar)",sets:3,reps:10,unit:"reps",notes:"NEW — Best-studied exercise for medial epicondylitis. Green TheraBand FlexBar.",pain:pr("0-3/10 at medial elbow","Stop if >3 or sharp.")},
-      {name:"Pronation/Supination",sets:2,reps:12,unit:"reps/dir",notes:"NEW — Hammer or offset dumbbell, rotate forearm slowly.",pain:pr("0-2/10 in elbow","Stop if >2.")},
-      {name:"Grip Squeeze Hold",sets:3,duration:20,unit:"sec",notes:"NEW — Tennis ball or gripper. Moderate resistance, sustained.",pain:pr("0-3/10 acceptable","Stop if >3 or if medial elbow flares.")},
-      {name:"Reverse Wrist Curl",sets:3,reps:12,unit:"reps",notes:"Progress to 5-8lb.",pain:pr("0-2/10 in elbow","Stop if medial elbow pain.")},
-    ],
-  },
-  {
-    id:4,name:"Impact Return",
-    freq:"Every other day minimum. Impact work needs more recovery time.",
-    rationale:"You got this from a fight. This phase rebuilds tolerance for impact, gripping under force, and sudden loading.",
-    warmup:"3 min: wrist circles + light shadow punching (no contact) + grip squeezes + arm swings.",
-    exercises:[
-      {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",notes:"Progress to red FlexBar if green is easy.",pain:pr("0-3/10 at medial elbow","Stop if >3.")},
-      {name:"Farmer's Carry",sets:3,duration:30,unit:"sec",notes:"NEW — Moderate-heavy weight. Crush the handle.",pain:pr("0-2/10 in elbow","Grip fatigue fine — elbow pain is not.")},
-      {name:"Towel Wring",sets:2,reps:10,unit:"reps/dir",notes:"NEW — Wet towel, wring out both directions.",pain:pr("0-3/10 acceptable","Stop if >3 or if it reproduces the sharp impact pain.")},
-      {name:"Ball Slam",sets:2,reps:8,unit:"reps",notes:"NEW — Light med ball (4-6lb). Overhead slam to floor.",pain:pr("0-2/10 in elbow on impact","Stop immediately if >2 or sharp.")},
-      {name:"Pronation/Supination",sets:3,reps:12,unit:"reps/dir",notes:"Increase weight.",pain:pr("0-2/10 in elbow","Stop if >2.")},
-      {name:"Heavy Bag Taps",sets:2,duration:20,unit:"sec",notes:"NEW — Light open-palm taps on a bag. Not punching yet.",pain:pr("0-2/10 only","Stop immediately if >2 or any sharp pain.")},
-    ],
-  },
-  {
-    id:5,name:"Full Send",
-    freq:"2-3x per week for maintenance. Striking sessions separate — this is the prehab that keeps you in the game.",
-    rationale:"The elbow passed every test. Now we bridge into actual striking — controlled, progressive, with clear stop rules. This becomes your permanent maintenance routine.",
-    warmup:"3-5 min: wrist circles → shadow boxing (light) → 10 Tyler Twists → grip squeezes → arm swings with increasing speed.",
-    exercises:[
-      {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",notes:"Red FlexBar. This stays in your routine permanently — your elbow's insurance policy.",pain:pr("0-2/10","If this starts hurting >2 again, that's your early warning.")},
-      {name:"Bag Work — Single Shots",sets:3,reps:10,unit:"reps",notes:"NEW — Closed fist, single straight punches at 50% power. Focus on wrist alignment. 10-sec rest between shots.",pain:pr("0-1/10 on impact","Stop immediately if any sharp pain. Drop back to open-palm taps for another week.")},
-      {name:"Bag Work — Light Combos",sets:2,duration:30,unit:"sec",notes:"NEW — 1-2 and 1-2-3 combos at 50-60% power. Only after singles are pain-free 3+ sessions.",pain:pr("0-1/10 on impact","Any pain = stop. Go back to singles.")},
-      {name:"Farmer's Carry (Heavy)",sets:3,duration:45,unit:"sec",notes:"Progress to heavier weight and longer holds.",pain:pr("0-1/10 in elbow","Grip fatigue fine. Elbow pain is not.")},
-      {name:"Ball Slam (Heavy)",sets:3,reps:10,unit:"reps",notes:"Progress to 8-10lb ball. Full power slams.",pain:pr("0-1/10 in elbow","Stop if any medial elbow pain on impact.")},
-      {name:"Wrist Roller",sets:2,reps:3,unit:"full rolls up/down",notes:"NEW — Wrist roller with 5-10lb. Roll up (flexion), then roll down (extension).",pain:pr("0-2/10","Stop if medial elbow flares. Drop weight.")},
-    ],
-    flareProtocol:"IF PAIN RETURNS: Stop all bag work and impact immediately. Go back to eccentrics + isometrics daily (Phase 1 loading) for 5-7 days. If daily-life pain drops below 2/10, skip to Phase 3 and work forward. If the sharp impact pain comes back on single shots, stay at Phase 4 (bag taps only) for 2 more weeks before retesting.",
-  },
+  {id:1,name:"Pain Reduction",freq:"Daily is fine — eccentrics and isometrics are low-dose.",rationale:"Eccentrics and isometrics to calm the tendon down. This came from impact so we're being careful.",warmup:"1-2 min wrist circles (both directions) + open/close fist 20 times.",exercises:[
+    {name:"Wrist Flexion Eccentric",sets:2,reps:10,unit:"reps",rest:60,notes:"5lb — Lift with left hand, lower slowly over 5 sec with right.",pain:pr("0-4/10 during lowering","Stop if >4 or sharp. Drop to 3lb.")},
+    {name:"Isometric Wrist Flexion Hold",sets:3,duration:25,unit:"sec",rest:45,notes:"Palm up, hold weight dead still.",pain:pr("0-3/10 acceptable","Stop set if >3. Drop weight or shorten hold.")},
+  ]},
+  {id:2,name:"Load Tolerance",freq:"Daily for isometrics. Eccentric/curl work every other day.",rationale:"Increasing weight, adding volume, introducing wrist extensors.",warmup:"1-2 min wrist circles + 10 light fist squeezes + 10 finger spreads.",exercises:[
+    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 7.5lb when 5lb feels easy.",pain:pr("0-4/10 during lowering","Stop if >4.")},
+    {name:"Isometric Wrist Flexion Hold",sets:3,duration:35,unit:"sec",rest:45,notes:"Progressed from 25s.",pain:pr("0-3/10 acceptable","Stop if >3.")},
+    {name:"Reverse Wrist Curl",sets:2,reps:12,unit:"reps",rest:60,notes:"NEW — 3-5lb, palm down, slow lower.",pain:pr("0-2/10 in elbow","Stop if any medial elbow pain.")},
+    {name:"Finger Extension (Band)",sets:2,reps:15,unit:"reps",rest:30,notes:"NEW — Band around all 5 fingers, spread apart.",pain:pr("0-1/10","Should be pain-free.")},
+  ]},
+  {id:3,name:"Grip & Rotation",freq:"Every other day. Grip work taxes the tendon.",rationale:"Your elbow needs to handle gripping, twisting, and sustained holds before impact.",warmup:"2 min wrist circles + light grip squeezes + 10 pronation/supination with no weight.",exercises:[
+    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 10lb.",pain:pr("0-4/10 during lowering","Stop if >4.")},
+    {name:"Tyler Twist (FlexBar)",sets:3,reps:10,unit:"reps",rest:60,notes:"NEW — Best-studied exercise for medial epicondylitis. Green TheraBand FlexBar.",pain:pr("0-3/10 at medial elbow","Stop if >3 or sharp.")},
+    {name:"Pronation/Supination",sets:2,reps:12,unit:"reps/dir",rest:45,notes:"NEW — Hammer or offset dumbbell, rotate forearm slowly.",pain:pr("0-2/10 in elbow","Stop if >2.")},
+    {name:"Grip Squeeze Hold",sets:3,duration:20,unit:"sec",rest:45,notes:"NEW — Tennis ball or gripper. Moderate resistance.",pain:pr("0-3/10 acceptable","Stop if >3.")},
+    {name:"Reverse Wrist Curl",sets:3,reps:12,unit:"reps",rest:60,notes:"Progress to 5-8lb.",pain:pr("0-2/10 in elbow","Stop if medial elbow pain.")},
+  ]},
+  {id:4,name:"Impact Return",freq:"Every other day minimum. Impact work needs more recovery.",rationale:"Rebuilding tolerance for impact, gripping under force, and sudden loading.",warmup:"3 min: wrist circles + light shadow punching (no contact) + grip squeezes + arm swings.",exercises:[
+    {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",rest:60,notes:"Progress to red FlexBar if green is easy.",pain:pr("0-3/10 at medial elbow","Stop if >3.")},
+    {name:"Farmer's Carry",sets:3,duration:30,unit:"sec",rest:60,notes:"NEW — Moderate-heavy weight. Crush the handle.",pain:pr("0-2/10 in elbow","Grip fatigue fine — elbow pain is not.")},
+    {name:"Towel Wring",sets:2,reps:10,unit:"reps/dir",rest:45,notes:"NEW — Wet towel, wring out both directions.",pain:pr("0-3/10 acceptable","Stop if >3 or reproduces sharp impact pain.")},
+    {name:"Ball Slam",sets:2,reps:8,unit:"reps",rest:60,notes:"NEW — Light med ball (4-6lb). Overhead slam.",pain:pr("0-2/10 on impact","Stop immediately if >2 or sharp.")},
+    {name:"Pronation/Supination",sets:3,reps:12,unit:"reps/dir",rest:45,notes:"Increase weight.",pain:pr("0-2/10 in elbow","Stop if >2.")},
+    {name:"Heavy Bag Taps",sets:2,duration:20,unit:"sec",rest:45,notes:"NEW — Light open-palm taps. Not punching yet.",pain:pr("0-2/10 only","Stop immediately if >2 or sharp.")},
+  ]},
+  {id:5,name:"Full Send",freq:"2-3x per week for maintenance. Striking sessions separate.",rationale:"The elbow passed every test. Now we bridge into actual striking — controlled, progressive. This becomes your permanent maintenance.",warmup:"3-5 min: wrist circles → shadow boxing (light) → 10 Tyler Twists → grip squeezes.",exercises:[
+    {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",rest:60,notes:"Red FlexBar. Your elbow's insurance policy.",pain:pr("0-2/10","If >2 again, that's your early warning.")},
+    {name:"Bag Work — Single Shots",sets:3,reps:10,unit:"reps",rest:60,notes:"NEW — Closed fist, 50% power. Focus on wrist alignment. 10-sec rest between shots.",pain:pr("0-1/10 on impact","Stop if any sharp pain. Drop back to open-palm taps.")},
+    {name:"Bag Work — Light Combos",sets:2,duration:30,unit:"sec",rest:60,notes:"NEW — 1-2 and 1-2-3 combos at 50-60% power. Only after singles pain-free 3+ sessions.",pain:pr("0-1/10 on impact","Any pain = stop. Go back to singles.")},
+    {name:"Farmer's Carry (Heavy)",sets:3,duration:45,unit:"sec",rest:60,notes:"Progress to heavier weight and longer holds.",pain:pr("0-1/10 in elbow","Grip fatigue fine. Elbow pain is not.")},
+    {name:"Ball Slam (Heavy)",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 8-10lb ball. Full power slams.",pain:pr("0-1/10 in elbow","Stop if any medial elbow pain on impact.")},
+    {name:"Wrist Roller",sets:2,reps:3,unit:"full rolls",rest:60,notes:"NEW — 5-10lb. Roll up (flexion), roll down (extension).",pain:pr("0-2/10","Stop if medial elbow flares.")},
+  ],flareProtocol:"IF PAIN RETURNS: Stop all bag work immediately. Eccentrics + isometrics daily for 5-7 days. If daily pain drops below 2/10, skip to Phase 3 and work forward. If sharp impact pain returns on singles, stay at Phase 4 bag taps for 2 more weeks."},
 ];
 
-// Storage — using localStorage for real deployment
+// Storage
 function loadState(){try{const d=localStorage.getItem("rehab-v3");return d?JSON.parse(d):{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}catch{return{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}}
 function saveState(s){try{localStorage.setItem("rehab-v3",JSON.stringify(s));}catch(e){console.error(e);}}
 
+// ── Rest Timer ──
+function RestTimer({seconds,onDone}){
+  const[left,setLeft]=useState(seconds);
+  const[active,setActive]=useState(false);
+  const[done,setDone]=useState(false);
+  const ref=useRef(null);
+
+  useEffect(()=>{
+    if(!active)return;
+    ref.current=setInterval(()=>{
+      setLeft(p=>{
+        if(p<=1){clearInterval(ref.current);setDone(true);setActive(false);if(onDone)onDone();try{navigator.vibrate&&navigator.vibrate(200);}catch{}return 0;}
+        return p-1;
+      });
+    },1000);
+    return()=>clearInterval(ref.current);
+  },[active]);
+
+  if(done)return(<div style={{textAlign:"center",padding:"8px 0",fontSize:11,fontFamily:"'Fira Code',monospace",color:"#22c55e",fontWeight:700,animation:"fadeIn 0.2s ease"}}>REST DONE — NEXT SET ↓</div>);
+
+  const mins=Math.floor(left/60);
+  const secs=left%60;
+  const display=mins>0?`${mins}:${String(secs).padStart(2,"0")}`:`${secs}s`;
+  const pct=(seconds-left)/seconds;
+
+  return(<div style={{padding:"10px 0",display:"flex",alignItems:"center",gap:10,justifyContent:"center"}}>
+    {!active?
+      <button onClick={()=>setActive(true)} style={{padding:"6px 16px",borderRadius:8,border:"1px solid rgba(96,165,250,0.2)",background:"rgba(96,165,250,0.06)",color:"rgba(147,197,253,0.8)",fontSize:12,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>⏱ Rest {display}</button>
+    :
+      <div style={{display:"flex",alignItems:"center",gap:10,animation:"fadeIn 0.2s ease"}}>
+        <div style={{width:120,height:6,borderRadius:3,background:"rgba(255,255,255,0.06)",overflow:"hidden"}}>
+          <div style={{width:`${pct*100}%`,height:"100%",borderRadius:3,background:"rgba(96,165,250,0.5)",transition:"width 1s linear"}}/>
+        </div>
+        <span style={{fontSize:16,fontFamily:"'Fira Code',monospace",fontWeight:700,color:"rgba(147,197,253,0.9)",minWidth:40,animation:left<=5?"timerPulse 1s ease infinite":"none"}}>{display}</span>
+        <button onClick={()=>{clearInterval(ref.current);setDone(true);setActive(false);}} style={{padding:"4px 10px",borderRadius:6,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.25)",fontSize:10,fontFamily:"'Fira Code',monospace",cursor:"pointer"}}>Skip</button>
+      </div>
+    }
+  </div>);
+}
+
+// ── Session Timer (overall elapsed) ──
+function SessionTimer({startTime}){
+  const[elapsed,setElapsed]=useState(0);
+  useEffect(()=>{
+    if(!startTime)return;
+    const tick=()=>setElapsed(Math.round((Date.now()-startTime)/1000));
+    tick();
+    const id=setInterval(tick,1000);
+    return()=>clearInterval(id);
+  },[startTime]);
+  const m=Math.floor(elapsed/60);
+  const s=elapsed%60;
+  return(<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"10px 0",marginBottom:8}}>
+    <span style={{fontSize:11,color:"rgba(255,255,255,0.2)",fontFamily:"'Fira Code',monospace",textTransform:"uppercase",letterSpacing:1}}>Session</span>
+    <span style={{fontSize:22,fontWeight:700,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.6)",minWidth:60,textAlign:"center"}}>{m}:{String(s).padStart(2,"0")}</span>
+  </div>);
+}
+
+// ── Components ──
 function PainTrend({sessions,id}){
   if(sessions.length<2)return null;
   const vals=sessions.slice(-14).map(s=>s.dailyPain);
@@ -197,17 +196,13 @@ function PainTrend({sessions,id}){
       React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,0.22)",fontFamily:"'Fira Code',monospace"}},"Daily pain trend"),
       React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
         React.createElement("span",{style:{fontSize:11,fontFamily:"'Fira Code',monospace",color:tc,fontWeight:700}},tl),
-        React.createElement("span",{style:{fontSize:10,color:"rgba(255,255,255,0.18)",fontFamily:"'Fira Code',monospace"}},"avg "+avg)
-      )
-    ),
+        React.createElement("span",{style:{fontSize:10,color:"rgba(255,255,255,0.18)",fontFamily:"'Fira Code',monospace"}},"avg "+avg))),
     <svg viewBox={`-4 -4 ${w+12} ${h+8}`} width="100%" height={h+8}>
       <defs><linearGradient id={`g-${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={tc} stopOpacity="0.15"/><stop offset="100%" stopColor={tc} stopOpacity="0"/></linearGradient></defs>
       <line x1="0" y1={h-(DAILY_PAIN_THRESHOLD/max)*h} x2={w} y2={h-(DAILY_PAIN_THRESHOLD/max)*h} stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3"/>
-      <polygon points={area} fill={`url(#g-${id})`}/>
-      <polyline points={pts} fill="none" stroke={tc} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      <polygon points={area} fill={`url(#g-${id})`}/><polyline points={pts} fill="none" stroke={tc} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
       {vals.map((v,i)=><circle key={i} cx={i*step} cy={h-(v/max)*h} r={i===vals.length-1?3.5:2} fill={i===vals.length-1?tc:"rgba(255,255,255,0.25)"} stroke={i===vals.length-1?"#0a0a0f":"none"} strokeWidth="2"/>)}
-    </svg>
-  );
+    </svg>);
 }
 
 function PainSlider({value,onChange,label,sub}){
@@ -230,54 +225,70 @@ function PainProtocol({pain}){
   </div>);
 }
 
-function ExCard({ex,checked,onToggle,idx,active}){
-  const desc=ex.duration?`${ex.sets} × ${ex.duration}s ${ex.unit}`:`${ex.sets} × ${ex.reps} ${ex.unit}${ex.holdSec?` · ${ex.holdSec}s hold`:""}`;
+// ── Exercise Card with individual set checkboxes ──
+function ExCard({ex,checked,onToggleSet,idx,active}){
+  const setDesc=ex.duration?`${ex.duration}s ${ex.unit}`:`${ex.reps} ${ex.unit}${ex.holdSec?` · ${ex.holdSec}s hold`:""}`;
   const isNew=ex.notes?.startsWith("NEW");
-  return(<div style={{borderRadius:13,overflow:"hidden",background:checked?"rgba(34,197,94,0.05)":"rgba(255,255,255,0.02)",border:checked?"1.5px solid rgba(34,197,94,0.2)":"1.5px solid rgba(255,255,255,0.04)",transition:"all 0.15s",userSelect:"none",animation:`fadeIn 0.3s ease both`,animationDelay:`${idx*40}ms`}}>
-    <div onClick={active?onToggle:undefined} style={{display:"flex",gap:12,padding:"13px 15px",cursor:active?"pointer":"default"}}>
-      {active&&<div style={{width:22,height:22,borderRadius:7,flexShrink:0,marginTop:1,border:checked?"none":"2px solid rgba(255,255,255,0.1)",background:checked?"#22c55e":"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
-        {checked&&<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L5.5 10L11 4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-      </div>}
-      <div style={{flex:1,minWidth:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}>
-          <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:14,color:checked?"rgba(255,255,255,0.35)":"#fff",textDecoration:checked?"line-through":"none"}}>{ex.name}</span>
-          {isNew&&<span style={{fontSize:9,fontWeight:700,fontFamily:"'Fira Code',monospace",letterSpacing:1.2,color:"#c084fc",background:"rgba(192,132,252,0.08)",padding:"2px 6px",borderRadius:4}}>NEW</span>}
-        </div>
-        <div style={{fontSize:12,color:"rgba(255,255,255,0.35)",fontFamily:"'Fira Code',monospace",marginTop:3}}>{desc}{ex.restSec?` · ${ex.restSec}s rest`:""}</div>
-        <div style={{fontSize:11.5,color:"rgba(255,255,255,0.22)",marginTop:4,lineHeight:1.4,fontStyle:"italic"}}>{(ex.notes||"").replace("NEW — ","")}</div>
-        <PainProtocol pain={ex.pain}/>
+  const allDone=Array.from({length:ex.sets},(_,s)=>checked[`${idx}-${s}`]).every(Boolean);
+
+  return(<div style={{borderRadius:13,overflow:"hidden",background:allDone?"rgba(34,197,94,0.05)":"rgba(255,255,255,0.02)",border:allDone?"1.5px solid rgba(34,197,94,0.2)":"1.5px solid rgba(255,255,255,0.04)",transition:"all 0.15s",animation:`fadeIn 0.3s ease both`,animationDelay:`${idx*40}ms`}}>
+    <div style={{padding:"13px 15px 8px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}>
+        <span style={{fontWeight:600,fontSize:14,color:allDone?"rgba(255,255,255,0.35)":"#fff",textDecoration:allDone?"line-through":"none"}}>{ex.name}</span>
+        {isNew&&<span style={{fontSize:9,fontWeight:700,fontFamily:"'Fira Code',monospace",letterSpacing:1.2,color:"#c084fc",background:"rgba(192,132,252,0.08)",padding:"2px 6px",borderRadius:4}}>NEW</span>}
+      </div>
+      <div style={{fontSize:11.5,color:"rgba(255,255,255,0.22)",marginTop:4,lineHeight:1.4,fontStyle:"italic"}}>{(ex.notes||"").replace("NEW — ","")}</div>
+      <PainProtocol pain={ex.pain}/>
+    </div>
+
+    {/* Individual sets */}
+    <div style={{padding:"4px 15px 13px"}}>
+      {Array.from({length:ex.sets},(_,s)=>{
+        const key=`${idx}-${s}`;
+        const isDone=!!checked[key];
+        const prevDone=s===0||!!checked[`${idx}-${s-1}`];
+        const showRest=isDone&&s<ex.sets-1&&!checked[`${idx}-${s+1}`]&&ex.rest>0;
+        return(<div key={s}>
+          <div onClick={active&&prevDone?()=>onToggleSet(key):undefined} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",cursor:active&&prevDone?"pointer":"default",opacity:active&&!prevDone&&!isDone?0.35:1,transition:"opacity 0.2s"}}>
+            {active&&<div style={{width:20,height:20,borderRadius:6,flexShrink:0,border:isDone?"none":"2px solid rgba(255,255,255,0.1)",background:isDone?"#22c55e":"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.15s"}}>
+              {isDone&&<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L5.5 10L11 4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            </div>}
+            <span style={{fontSize:12,fontFamily:"'Fira Code',monospace",color:isDone?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.5)",textDecoration:isDone?"line-through":"none"}}>Set {s+1}</span>
+            <span style={{fontSize:11,fontFamily:"'Fira Code',monospace",color:isDone?"rgba(255,255,255,0.15)":"rgba(255,255,255,0.3)"}}>{setDesc}</span>
+          </div>
+          {showRest&&active&&<RestTimer key={`rest-${key}`} seconds={ex.rest||DEFAULT_REST}/>}
+        </div>);
+      })}
+    </div>
+  </div>);
+}
+
+function Streak({count,req}){return(<div style={{display:"flex",gap:5,alignItems:"center"}}>{Array.from({length:req},(_,i)=><div key={i} style={{width:9,height:9,borderRadius:"50%",background:i<count?"#22c55e":"rgba(255,255,255,0.05)",border:i<count?"none":"1px solid rgba(255,255,255,0.07)"}}/>)}<span style={{fontSize:11,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.25)",marginLeft:3}}>{count}/{req}</span></div>);}
+
+function TL({total,cur}){return(<div style={{display:"flex",alignItems:"center",margin:"12px 0"}}>{Array.from({length:total},(_,i)=>{const p=i+1,a=p===cur,d=p<cur;return(<div key={p} style={{display:"flex",alignItems:"center",flex:1}}><div style={{width:28,height:28,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Fira Code',monospace",fontSize:11,fontWeight:700,background:a?"#22c55e":d?"rgba(34,197,94,0.12)":"rgba(255,255,255,0.02)",color:a?"#000":d?"#22c55e":"rgba(255,255,255,0.1)",border:a?"none":`1.5px solid ${d?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.04)"}`,flexShrink:0,zIndex:1}}>{d?"✓":p}</div>{i<total-1&&<div style={{flex:1,height:2,background:d?"rgba(34,197,94,0.2)":"rgba(255,255,255,0.03)"}}/>}</div>);})}</div>);}
+
+function Stat({label,value,sub,color="#fff"}){return(<div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:11,padding:"11px 13px",flex:1,minWidth:0}}><div style={{fontSize:9.5,color:"rgba(255,255,255,0.25)",textTransform:"uppercase",letterSpacing:0.8}}>{label}</div><div style={{fontSize:19,fontWeight:700,fontFamily:"'Fira Code',monospace",color,marginTop:2}}>{value}</div>{sub&&<div style={{fontSize:10,color:"rgba(255,255,255,0.18)",marginTop:2}}>{sub}</div>}</div>);}
+
+// ── Skip Day Check-In Modal ──
+function SkipDayCheckin({tracks,onSubmit,onDismiss}){
+  const[pains,setPains]=useState(()=>{const p={};tracks.forEach(t=>p[t]=3);return p;});
+  return(<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16,animation:"fadeIn 0.3s ease"}}>
+    <div style={{background:"#111118",border:"1.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px",maxWidth:340,width:"100%"}}>
+      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>Welcome back</div>
+      <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:20}}>You missed a day — that's okay. Just don't miss the next one. Quick check-in before you go:</div>
+      {tracks.map(t=><div key={t} style={{marginBottom:16}}>
+        <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)",marginBottom:4}}>{t==="knee"?"🦵 How's your knee":"💪 How's your elbow"} feeling in daily life?</div>
+        <PainSlider value={pains[t]} onChange={v=>setPains(p=>({...p,[t]:v}))} label="" sub=""/>
+      </div>)}
+      <div style={{display:"flex",gap:8}}>
+        <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Skip</button>
+        <button onClick={()=>onSubmit(pains)} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Check-In</button>
       </div>
     </div>
   </div>);
 }
 
-function Streak({count,req}){
-  return(<div style={{display:"flex",gap:5,alignItems:"center"}}>
-    {Array.from({length:req},(_,i)=><div key={i} style={{width:9,height:9,borderRadius:"50%",background:i<count?"#22c55e":"rgba(255,255,255,0.05)",border:i<count?"none":"1px solid rgba(255,255,255,0.07)"}}/>)}
-    <span style={{fontSize:11,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.25)",marginLeft:3}}>{count}/{req}</span>
-  </div>);
-}
-
-function TL({total,cur}){
-  return(<div style={{display:"flex",alignItems:"center",margin:"12px 0"}}>
-    {Array.from({length:total},(_,i)=>{
-      const p=i+1,a=p===cur,d=p<cur;
-      return(<div key={p} style={{display:"flex",alignItems:"center",flex:1}}>
-        <div style={{width:28,height:28,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Fira Code',monospace",fontSize:11,fontWeight:700,background:a?"#22c55e":d?"rgba(34,197,94,0.12)":"rgba(255,255,255,0.02)",color:a?"#000":d?"#22c55e":"rgba(255,255,255,0.1)",border:a?"none":`1.5px solid ${d?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.04)"}`,flexShrink:0,zIndex:1}}>{d?"✓":p}</div>
-        {i<total-1&&<div style={{flex:1,height:2,background:d?"rgba(34,197,94,0.2)":"rgba(255,255,255,0.03)"}}/>}
-      </div>);
-    })}
-  </div>);
-}
-
-function Stat({label,value,sub,color="#fff"}){
-  return(<div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:11,padding:"11px 13px",flex:1,minWidth:0}}>
-    <div style={{fontSize:9.5,color:"rgba(255,255,255,0.25)",textTransform:"uppercase",letterSpacing:0.8}}>{label}</div>
-    <div style={{fontSize:19,fontWeight:700,fontFamily:"'Fira Code',monospace",color,marginTop:2}}>{value}</div>
-    {sub&&<div style={{fontSize:10,color:"rgba(255,255,255,0.18)",marginTop:2}}>{sub}</div>}
-  </div>);
-}
-
+// ── App ──
 function App(){
   const[state,setState]=useState(()=>loadState());
   const[track,setTrack]=useState(null);
@@ -288,37 +299,50 @@ function App(){
   const[notes,setNotes]=useState("");
   const[unlock,setUnlock]=useState(null);
   const[vPhase,setVPhase]=useState(null);
+  const[skipCheck,setSkipCheck]=useState(null);
+  const sessionStartRef=useRef(null);
 
-  // Android back button support via history API
-  const goToTrack = useCallback((t) => {
-    setTrack(t); setVPhase(null);
-    history.pushState({view:"track",track:t}, "");
-  }, []);
+  // Check for skipped days on mount
+  useEffect(()=>{
+    const st=loadState();
+    const missed=[];
+    ["knee","elbow"].forEach(t=>{
+      const s=st[t].sessions;
+      if(s.length===0)return;
+      const last=s[s.length-1].date;
+      const diffMs=new Date(TODAY())-new Date(last);
+      const diffDays=diffMs/(1000*60*60*24);
+      const doneToday=s.some(x=>x.date===TODAY());
+      if(diffDays>=2&&!doneToday)missed.push(t);
+    });
+    if(missed.length>0)setSkipCheck(missed);
+  },[]);
 
-  const goHome = useCallback(() => {
-    setTrack(null); setInSession(false); setChecked({}); setVPhase(null);
-  }, []);
+  const goToTrack=useCallback(t=>{setTrack(t);setVPhase(null);history.pushState({view:"track",track:t},"");},[]);
+  const goHome=useCallback(()=>{setTrack(null);setInSession(false);setChecked({});setVPhase(null);},[]);
 
-  useEffect(() => {
-    const onBack = (e) => {
-      if (inSession) {
-        e.preventDefault();
-        history.pushState(null, "");
-        setInSession(false); setChecked({}); setNotes("");
-      } else if (track) {
-        goHome();
-      }
+  useEffect(()=>{
+    const onBack=e=>{
+      if(inSession){e.preventDefault();history.pushState(null,"");setInSession(false);setChecked({});setNotes("");sessionStartRef.current=null;}
+      else if(track){goHome();}
     };
-    window.addEventListener("popstate", onBack);
-    return () => window.removeEventListener("popstate", onBack);
-  }, [track, inSession, goHome]);
+    window.addEventListener("popstate",onBack);
+    return()=>window.removeEventListener("popstate",onBack);
+  },[track,inSession,goHome]);
 
-  const startSession = useCallback(() => {
-    setInSession(true);
-    history.pushState({view:"session"}, "");
-  }, []);
-
+  const startSession=useCallback(()=>{setInSession(true);sessionStartRef.current=Date.now();history.pushState({view:"session"},"");},[]);
   const persist=useCallback(ns=>{setState(ns);saveState(ns);},[]);
+
+  // Handle skip-day check-in submission
+  const handleSkipCheckin=useCallback(pains=>{
+    let ns={...state};
+    Object.entries(pains).forEach(([t,pain])=>{
+      const checkin={date:TODAY(),sessionPain:0,dailyPain:pain,phase:ns[t].phase,notes:"Rest day check-in",type:"checkin"};
+      ns={...ns,[t]:{...ns[t],sessions:[...ns[t].sessions,checkin]}};
+    });
+    persist(ns);
+    setSkipCheck(null);
+  },[state,persist]);
 
   const phases=track==="knee"?KNEE_PHASES:ELBOW_PHASES;
   const ts=track?state[track]:null;
@@ -326,28 +350,31 @@ function App(){
   const dispPhase=vPhase?phases.find(p=>p.id===vPhase):curPhase;
   const pSess=ts?ts.sessions.filter(s=>s.phase===ts.phase):[];
   const dAvg=pSess.length?(pSess.reduce((a,s)=>a+s.dailyPain,0)/pSess.length).toFixed(1):"—";
-  const sAvg=pSess.length?(pSess.reduce((a,s)=>a+s.sessionPain,0)/pSess.length).toFixed(1):"—";
+  const sAvg=pSess.length?(pSess.filter(s=>s.type!=="checkin").reduce((a,s)=>a+s.sessionPain,0)/(pSess.filter(s=>s.type!=="checkin").length||1)).toFixed(1):"—";
   const canAdv=ts&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
-  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase):false;
+  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"):false;
   const pc=v=>v==="—"?"#555":parseFloat(v)<=2?"#22c55e":parseFloat(v)<=DAILY_PAIN_THRESHOLD?"#4ade80":parseFloat(v)<=5?"#eab308":"#ef4444";
 
+  // All sets checked?
+  const exercises=dispPhase?.exercises||[];
+  const allChecked=exercises.every((ex,ei)=>Array.from({length:ex.sets},(_,s)=>checked[`${ei}-${s}`]).every(Boolean));
+  const isCur=(vPhase||ts?.phase)===ts?.phase;
+
   const complete=()=>{
-    const sess={date:TODAY(),sessionPain:sPain,dailyPain:dPain,phase:ts.phase,notes:notes.trim(),done:Object.values(checked).filter(Boolean).length};
-    const newS=[...ts.sessions.filter(s=>!(s.date===TODAY()&&s.phase===ts.phase)),sess];
+    const durSec=sessionStartRef.current?Math.round((Date.now()-sessionStartRef.current)/1000):0;
+    const sess={date:TODAY(),sessionPain:sPain,dailyPain:dPain,phase:ts.phase,notes:notes.trim(),setsCompleted:Object.values(checked).filter(Boolean).length,duration:durSec};
+    const newS=[...ts.sessions.filter(s=>!(s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin")),sess];
     persist({...state,[track]:{...ts,sessions:newS}});
-    setInSession(false);setChecked({});setSPain(3);setDPain(3);setNotes("");
+    setInSession(false);setChecked({});setSPain(3);setDPain(3);setNotes("");sessionStartRef.current=null;
     history.back();
   };
 
-  const advance=()=>{
-    const n=ts.phase+1;
-    persist({...state,[track]:{...ts,phase:n}});
-    setUnlock(n);setTimeout(()=>setUnlock(null),3500);
-  };
-
+  const advance=()=>{const n=ts.phase+1;persist({...state,[track]:{...ts,phase:n}});setUnlock(n);setTimeout(()=>setUnlock(null),3500);};
   const reset=()=>{if(confirm("Reset all progress for this track?")){persist({...state,[track]:{phase:1,sessions:[]}});setVPhase(null);}};
-
   const root={minHeight:"100vh",minHeight:"100dvh",background:"#0a0a0f",color:"#fff",fontFamily:"'Outfit',sans-serif",maxWidth:460,margin:"0 auto",padding:"0 16px 100px"};
+
+  // Skip day check-in overlay
+  if(skipCheck)return(<div style={root}><SkipDayCheckin tracks={skipCheck} onSubmit={handleSkipCheckin} onDismiss={()=>setSkipCheck(null)}/></div>);
 
   // DASHBOARD
   if(!track){
@@ -360,7 +387,7 @@ function App(){
       {[{key:"knee",label:"Right Knee",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const ps=d.sessions.filter(s=>s.phase===d.phase);
-        const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase);
+        const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin");
         const da=ps.length?(ps.reduce((a,s)=>a+s.dailyPain,0)/ps.length).toFixed(1):"—";
         return(<div key={t.key} onClick={()=>goToTrack(t.key)}
           style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.045)",borderRadius:18,padding:"20px 18px",marginBottom:12,cursor:"pointer",transition:"all 0.2s",animation:`fadeIn 0.4s ease both`,animationDelay:`${(ti+1)*80}ms`}}>
@@ -376,21 +403,16 @@ function App(){
       })}
       <div style={{marginTop:16,padding:16,background:"rgba(255,255,255,0.012)",borderRadius:14,border:"1px solid rgba(255,255,255,0.025)"}}>
         <div style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,0.35)",textTransform:"uppercase",letterSpacing:0.8,marginBottom:6}}>Progression Rules</div>
-        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. Each exercise has its own pain protocol. Tracks progress independently.</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. Rest-day check-ins count toward your pain average.</div>
       </div>
     </div>);
   }
 
   // TRACK DETAIL
-  const exercises=dispPhase?.exercises||[];
-  const allChecked=exercises.every((_,i)=>checked[i]);
-  const isCur=(vPhase||ts.phase)===ts.phase;
-
   return(<div style={root}>
     {unlock&&<div onClick={()=>setUnlock(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,animation:"fadeIn 0.2s ease"}}>
       <div style={{background:"#111118",border:"1.5px solid rgba(34,197,94,0.25)",borderRadius:22,padding:"44px 32px",textAlign:"center",maxWidth:300,animation:"burst 0.5s ease"}}>
-        <div style={{fontSize:52,marginBottom:14}}>🔓</div>
-        <div style={{fontSize:22,fontWeight:800}}>Phase {unlock}</div>
+        <div style={{fontSize:52,marginBottom:14}}>🔓</div><div style={{fontSize:22,fontWeight:800}}>Phase {unlock}</div>
         <div style={{fontSize:15,color:"#22c55e",fontWeight:600,marginTop:4}}>{phases.find(p=>p.id===unlock)?.name}</div>
         <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginTop:10,lineHeight:1.5}}>{phases.find(p=>p.id===unlock)?.rationale}</div>
       </div>
@@ -432,14 +454,16 @@ function App(){
 
     {!canAdv&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)>DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"13px 15px",borderRadius:12,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.1)",marginBottom:14,fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.6}}>⚠️ Sessions complete, but daily pain avg is {dAvg}/10 — needs to be ≤{DAILY_PAIN_THRESHOLD}. Keep at it.</div>}
 
-    {ts.phase===phases.length&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14,animation:"fadeIn 0.3s ease"}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Protocol Complete — Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging sessions 2-3x per week. If pain creeps back, check the flare protocol above.</div></div>}
+    {ts.phase===phases.length&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging 2-3x per week. If pain creeps back, check the flare protocol.</div></div>}
+
+    {inSession&&<SessionTimer startTime={sessionStartRef.current}/>}
 
     {inSession&&dispPhase?.warmup&&<div style={{display:"flex",alignItems:"flex-start",gap:10,padding:"12px 14px",background:"rgba(250,204,21,0.04)",border:"1px solid rgba(250,204,21,0.1)",borderRadius:12,marginBottom:12,animation:"fadeIn 0.25s ease"}}><span style={{fontSize:16,flexShrink:0}}>🔥</span><div><div style={{fontSize:12,fontWeight:700,color:"rgba(253,224,71,0.8)",marginBottom:2}}>Warm up first</div><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",lineHeight:1.5}}>{dispPhase.warmup}</div></div></div>}
 
     <div style={{marginBottom:14}}>
       <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",textTransform:"uppercase",letterSpacing:1.5,marginBottom:10}}>Exercises · {exercises.length}</div>
       <div style={{display:"flex",flexDirection:"column",gap:6}}>
-        {exercises.map((ex,i)=><ExCard key={i} ex={ex} idx={i} active={inSession&&isCur} checked={!!checked[i]} onToggle={()=>setChecked(p=>({...p,[i]:!p[i]}))}/>)}
+        {exercises.map((ex,i)=><ExCard key={i} ex={ex} idx={i} active={inSession&&isCur} checked={checked} onToggleSet={key=>setChecked(p=>({...p,[key]:!p[key]}))}/>)}
       </div>
     </div>
 
@@ -449,8 +473,8 @@ function App(){
       {inSession&&<div style={{animation:"fadeIn 0.25s ease"}}>
         <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:16,padding:18,marginBottom:12}}>
           <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>Post-Session Check-In</div>
-          <PainSlider value={sPain} onChange={setSPain} label="During the exercises" sub="How much did it hurt while doing the rehab? (tracked but doesn't gate you)"/>
-          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub={`How does your ${track==="knee"?"knee":"elbow"} feel doing normal things? This gates your progression.`}/>
+          <PainSlider value={sPain} onChange={setSPain} label="During the exercises" sub="How much did it hurt? (tracked but doesn't gate you)"/>
+          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub={`How does your ${track==="knee"?"knee":"elbow"} feel doing normal things? This gates progression.`}/>
           <div style={{marginTop:4}}>
             <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.45)",marginBottom:4}}>Notes <span style={{fontWeight:400,color:"rgba(255,255,255,0.18)"}}>(optional)</span></div>
             <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anything notable?" rows={2} style={{width:"100%",padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13,resize:"vertical",outline:"none"}}/>
@@ -466,8 +490,8 @@ function App(){
     {pSess.length>0&&isCur&&!inSession&&<div style={{marginTop:20}}>
       <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>Recent Sessions</div>
       {pSess.slice(-5).reverse().map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 13px",borderRadius:9,background:"rgba(255,255,255,0.012)",border:"1px solid rgba(255,255,255,0.025)",marginBottom:4,fontSize:11.5}}>
-        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{s.notes&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
-        <div style={{display:"flex",gap:10,fontFamily:"'Fira Code',monospace",flexShrink:0}}><span style={{color:"rgba(255,255,255,0.25)"}}>sess:<span style={{color:pc(String(s.sessionPain))}}>{s.sessionPain}</span></span><span style={{color:"rgba(255,255,255,0.25)"}}>daily:<span style={{color:pc(String(s.dailyPain)),fontWeight:700}}>{s.dailyPain}</span></span></div>
+        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{s.type==="checkin"&&<span style={{color:"rgba(96,165,250,0.5)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>REST DAY</span>}{s.duration>0&&<span style={{color:"rgba(255,255,255,0.2)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{Math.floor(s.duration/60)}:{String(s.duration%60).padStart(2,"0")}</span>}{s.notes&&s.type!=="checkin"&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
+        <div style={{display:"flex",gap:10,fontFamily:"'Fira Code',monospace",flexShrink:0}}>{s.type!=="checkin"&&<span style={{color:"rgba(255,255,255,0.25)"}}>sess:<span style={{color:pc(String(s.sessionPain))}}>{s.sessionPain}</span></span>}<span style={{color:"rgba(255,255,255,0.25)"}}>daily:<span style={{color:pc(String(s.dailyPain)),fontWeight:700}}>{s.dailyPain}</span></span></div>
       </div>)}
     </div>}
 
@@ -477,8 +501,6 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-<script>
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
-</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
 </body>
 </html>
