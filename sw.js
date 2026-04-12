@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rehab-v4';
+const CACHE_NAME = 'rehab-v7';
 const ASSETS = [
   '/rehab/',
   '/rehab/index.html',

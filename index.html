@@ -39,6 +39,7 @@ const SESSIONS_TO_UNLOCK = 7;
 const DAILY_PAIN_THRESHOLD = 3;
 const DEFAULT_REST = 60;
 const TODAY = () => new Date().toISOString().split("T")[0];
+const YESTERDAY = () => { const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().split("T")[0]; };
 const pr = (ok, stop) => ({ok, stop});
 
 const KNEE_PHASES = [
@@ -83,9 +84,10 @@ const KNEE_PHASES = [
 ];
 
 const ELBOW_PHASES = [
-  {id:1,name:"Pain Reduction",freq:"Daily is fine — eccentrics and isometrics are low-dose.",rationale:"Eccentrics and isometrics to calm the tendon down. This came from impact so we're being careful.",warmup:"1-2 min wrist circles (both directions) + open/close fist 20 times.",exercises:[
-    {name:"Wrist Flexion Eccentric",sets:2,reps:10,unit:"reps",rest:60,notes:"5lb — Lift with left hand, lower slowly over 5 sec with right.",pain:pr("0-4/10 during lowering","Stop if >4 or sharp. Drop to 3lb.")},
-    {name:"Isometric Wrist Flexion Hold",sets:3,duration:25,unit:"sec",rest:45,notes:"Palm up, hold weight dead still.",pain:pr("0-3/10 acceptable","Stop set if >3. Drop weight or shorten hold.")},
+  {id:1,name:"Pain Reduction",freq:"Daily. Do the isometrics twice a day if you can — once in your session, once later for pain relief.",rationale:"This is tendinopathy now, not inflammation. The tendon needs load to remodel, not rest. Isometric holds are the strongest evidence-based tool for acute tendinopathy pain — a single bout can reduce pain for hours. We're dosing them heavy.",warmup:"1-2 min wrist circles (both directions) + open/close fist 20 times.",exercises:[
+    {name:"Isometric Wrist Flexion Hold",sets:4,duration:40,unit:"sec",rest:45,notes:"Palm up, hold weight dead still. This is your primary pain management tool. Can repeat these 4 sets a second time later in the day.",pain:pr("0-4/10 acceptable","Stop set if >4. Drop weight or shorten hold. Some discomfort is expected — you're loading a degenerative tendon.")},
+    {name:"Wrist Flexion Eccentric",sets:2,reps:10,unit:"reps",rest:60,notes:"5lb — Lift with left hand, lower slowly over 5 sec with right. If 5lb is too much at 5/10 daily pain, start at 3lb.",pain:pr("0-4/10 during lowering","Stop if >4 or sharp. Drop weight.")},
+    {name:"Isometric Wrist Extension Hold",sets:2,duration:30,unit:"sec",rest:45,notes:"NEW — Palm down, hold weight still. Loads the other side of the tendon. Balances the flexor work.",pain:pr("0-2/10 in elbow","Stop if medial elbow flares. This should not aggravate golfer's elbow directly.")},
   ]},
   {id:2,name:"Load Tolerance",freq:"Daily for isometrics. Eccentric/curl work every other day.",rationale:"Increasing weight, adding volume, introducing wrist extensors.",warmup:"1-2 min wrist circles + 10 light fist squeezes + 10 finger spreads.",exercises:[
     {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 7.5lb when 5lb feels easy.",pain:pr("0-4/10 during lowering","Stop if >4.")},
@@ -269,20 +271,49 @@ function TL({total,cur}){return(<div style={{display:"flex",alignItems:"center",
 
 function Stat({label,value,sub,color="#fff"}){return(<div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:11,padding:"11px 13px",flex:1,minWidth:0}}><div style={{fontSize:9.5,color:"rgba(255,255,255,0.25)",textTransform:"uppercase",letterSpacing:0.8}}>{label}</div><div style={{fontSize:19,fontWeight:700,fontFamily:"'Fira Code',monospace",color,marginTop:2}}>{value}</div>{sub&&<div style={{fontSize:10,color:"rgba(255,255,255,0.18)",marginTop:2}}>{sub}</div>}</div>);}
 
-// ── Skip Day Check-In Modal ──
+// ── Skip Day Check-In Modal (failsafe — logs yesterday's pain) ──
 function SkipDayCheckin({tracks,onSubmit,onDismiss}){
   const[pains,setPains]=useState(()=>{const p={};tracks.forEach(t=>p[t]=3);return p;});
+  const[skipped,setSkipped]=useState({});
+  const toggleSkip=t=>setSkipped(p=>({...p,[t]:!p[t]}));
+  const submit=()=>{
+    const out={};
+    tracks.forEach(t=>{ out[t]=skipped[t]?null:pains[t]; });
+    onSubmit(out);
+  };
   return(<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16,animation:"fadeIn 0.3s ease"}}>
     <div style={{background:"#111118",border:"1.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px",maxWidth:340,width:"100%"}}>
-      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>Welcome back</div>
-      <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:20}}>You missed a day — that's okay. Just don't miss the next one. Quick check-in before you go:</div>
-      {tracks.map(t=><div key={t} style={{marginBottom:16}}>
-        <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)",marginBottom:4}}>{t==="knee"?"🦵 How's your knee":"💪 How's your elbow"} feeling in daily life?</div>
-        <PainSlider value={pains[t]} onChange={v=>setPains(p=>({...p,[t]:v}))} label="" sub=""/>
+      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>Yesterday's Check-In</div>
+      <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:6}}>You didn't log yesterday. This is for <span style={{color:"rgba(255,255,255,0.7)",fontWeight:600}}>yesterday</span> — best honest recall.</div>
+      <div style={{fontSize:11,color:"rgba(96,165,250,0.5)",fontFamily:"'Fira Code',monospace",marginBottom:20}}>Can't remember? Hit Skip on that one.</div>
+      {tracks.map(t=><div key={t} style={{marginBottom:16,opacity:skipped[t]?0.35:1,transition:"opacity 0.2s"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+          <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)"}}>{t==="knee"?"🦵 Knee":"💪 Elbow"} — daily life yesterday</div>
+          <button onClick={()=>toggleSkip(t)} style={{background:skipped[t]?"rgba(96,165,250,0.12)":"rgba(255,255,255,0.04)",border:skipped[t]?"1px solid rgba(96,165,250,0.3)":"1px solid rgba(255,255,255,0.05)",color:skipped[t]?"rgba(96,165,250,0.8)":"rgba(255,255,255,0.25)",borderRadius:7,padding:"3px 9px",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>
+            {skipped[t]?"skipped":"skip"}
+          </button>
+        </div>
+        {!skipped[t]&&<PainSlider value={pains[t]} onChange={v=>setPains(p=>({...p,[t]:v}))} label="" sub=""/>}
       </div>)}
-      <div style={{display:"flex",gap:8}}>
-        <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Skip</button>
-        <button onClick={()=>onSubmit(pains)} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Check-In</button>
+      <div style={{display:"flex",gap:8,marginTop:4}}>
+        <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Dismiss</button>
+        <button onClick={submit} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Check-In</button>
+      </div>
+    </div>
+  </div>);
+}
+
+// ── Rest Day Modal ──
+function RestDayModal({track,onSubmit,onDismiss}){
+  const[pain,setPain]=useState(3);
+  return(<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16,animation:"fadeIn 0.3s ease"}}>
+    <div style={{background:"#111118",border:"1.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px",maxWidth:340,width:"100%"}}>
+      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>{track==="knee"?"🦵 Knee":"💪 Elbow"} Rest Day</div>
+      <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:20}}>Logging this now while it's fresh means no guessing tomorrow.</div>
+      <PainSlider value={pain} onChange={setPain} label="Daily life pain — right now" sub={`How does your ${track==="knee"?"knee":"elbow"} feel doing normal things?`}/>
+      <div style={{display:"flex",gap:8,marginTop:16}}>
+        <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancel</button>
+        <button onClick={()=>onSubmit(track,pain)} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Rest Day</button>
       </div>
     </div>
   </div>);
@@ -300,20 +331,19 @@ function App(){
   const[unlock,setUnlock]=useState(null);
   const[vPhase,setVPhase]=useState(null);
   const[skipCheck,setSkipCheck]=useState(null);
+  const[logRestDayFor,setLogRestDayFor]=useState(null);
   const sessionStartRef=useRef(null);
 
-  // Check for skipped days on mount
+  // Failsafe: fire only if yesterday had no entry at all (rest day button wasn't used)
   useEffect(()=>{
     const st=loadState();
     const missed=[];
     ["knee","elbow"].forEach(t=>{
       const s=st[t].sessions;
       if(s.length===0)return;
-      const last=s[s.length-1].date;
-      const diffMs=new Date(TODAY())-new Date(last);
-      const diffDays=diffMs/(1000*60*60*24);
+      const hadYesterday=s.some(x=>x.date===YESTERDAY());
       const doneToday=s.some(x=>x.date===TODAY());
-      if(diffDays>=2&&!doneToday)missed.push(t);
+      if(!hadYesterday&&!doneToday)missed.push(t);
     });
     if(missed.length>0)setSkipCheck(missed);
   },[]);
@@ -333,15 +363,23 @@ function App(){
   const startSession=useCallback(()=>{setInSession(true);sessionStartRef.current=Date.now();history.pushState({view:"session"},"");},[]);
   const persist=useCallback(ns=>{setState(ns);saveState(ns);},[]);
 
-  // Handle skip-day check-in submission
+  // Handle skip-day check-in submission — pain===null means user skipped that track
   const handleSkipCheckin=useCallback(pains=>{
     let ns={...state};
     Object.entries(pains).forEach(([t,pain])=>{
-      const checkin={date:TODAY(),sessionPain:0,dailyPain:pain,phase:ns[t].phase,notes:"Rest day check-in",type:"checkin"};
+      if(pain===null)return;
+      const checkin={date:YESTERDAY(),sessionPain:0,dailyPain:pain,phase:ns[t].phase,notes:"Missed day check-in",type:"checkin"};
       ns={...ns,[t]:{...ns[t],sessions:[...ns[t].sessions,checkin]}};
     });
     persist(ns);
     setSkipCheck(null);
+  },[state,persist]);
+
+  // Handle rest day button from dashboard
+  const handleRestDay=useCallback((t,pain)=>{
+    const entry={date:TODAY(),sessionPain:0,dailyPain:pain,phase:state[t].phase,notes:"Rest day",type:"restday"};
+    persist({...state,[t]:{...state[t],sessions:[...state[t].sessions,entry]}});
+    setLogRestDayFor(null);
   },[state,persist]);
 
   const phases=track==="knee"?KNEE_PHASES:ELBOW_PHASES;
@@ -349,10 +387,11 @@ function App(){
   const curPhase=ts?phases.find(p=>p.id===ts.phase):null;
   const dispPhase=vPhase?phases.find(p=>p.id===vPhase):curPhase;
   const pSess=ts?ts.sessions.filter(s=>s.phase===ts.phase):[];
+  const pSessReal=pSess.filter(s=>s.type!=="checkin");
   const dAvg=pSess.length?(pSess.reduce((a,s)=>a+s.dailyPain,0)/pSess.length).toFixed(1):"—";
-  const sAvg=pSess.length?(pSess.filter(s=>s.type!=="checkin").reduce((a,s)=>a+s.sessionPain,0)/(pSess.filter(s=>s.type!=="checkin").length||1)).toFixed(1):"—";
-  const canAdv=ts&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
-  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"):false;
+  const sAvg=pSessReal.length?(pSessReal.reduce((a,s)=>a+s.sessionPain,0)/pSessReal.length).toFixed(1):"—";
+  const canAdv=ts&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
+  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"&&s.type!=="restday"):false;
   const pc=v=>v==="—"?"#555":parseFloat(v)<=2?"#22c55e":parseFloat(v)<=DAILY_PAIN_THRESHOLD?"#4ade80":parseFloat(v)<=5?"#eab308":"#ef4444";
 
   // All sets checked?
@@ -376,9 +415,13 @@ function App(){
   // Skip day check-in overlay
   if(skipCheck)return(<div style={root}><SkipDayCheckin tracks={skipCheck} onSubmit={handleSkipCheckin} onDismiss={()=>setSkipCheck(null)}/></div>);
 
+  // Rest day modal overlay
+  const restDayOverlay=logRestDayFor?<RestDayModal track={logRestDayFor} onSubmit={handleRestDay} onDismiss={()=>setLogRestDayFor(null)}/>:null;
+
   // DASHBOARD
   if(!track){
     return(<div style={root}>
+      {restDayOverlay}
       <div style={{padding:"44px 0 20px",animation:"fadeIn 0.35s ease"}}>
         <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:8}}>Rehab Protocol</div>
         <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Your Recovery</h1>
@@ -387,23 +430,27 @@ function App(){
       {[{key:"knee",label:"Right Knee",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const ps=d.sessions.filter(s=>s.phase===d.phase);
-        const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin");
+        const psReal=ps.filter(s=>s.type!=="checkin");
+        const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin"&&s.type!=="restday");
+        const restToday=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type==="restday");
         const da=ps.length?(ps.reduce((a,s)=>a+s.dailyPain,0)/ps.length).toFixed(1):"—";
         return(<div key={t.key} onClick={()=>goToTrack(t.key)}
           style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.045)",borderRadius:18,padding:"20px 18px",marginBottom:12,cursor:"pointer",transition:"all 0.2s",animation:`fadeIn 0.4s ease both`,animationDelay:`${(ti+1)*80}ms`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div><span style={{fontSize:18}}>{t.icon}</span><div style={{fontSize:17,fontWeight:700,marginTop:4}}>{t.label}</div><div style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:2}}>{t.sub}</div></div>
             {done&&<span style={{fontSize:10,fontFamily:"'Fira Code',monospace",fontWeight:700,color:"#22c55e",background:"rgba(34,197,94,0.07)",padding:"3px 8px",borderRadius:6}}>DONE TODAY</span>}
+            {restToday&&!done&&<span style={{fontSize:10,fontFamily:"'Fira Code',monospace",fontWeight:700,color:"rgba(96,165,250,0.7)",background:"rgba(96,165,250,0.07)",padding:"3px 8px",borderRadius:6}}>REST TODAY</span>}
           </div>
           <div style={{fontSize:11,color:"rgba(255,255,255,0.25)",fontFamily:"'Fira Code',monospace",marginTop:12}}>Phase {d.phase}/{t.ph.length} · {phase?.name}</div>
-          <div style={{marginTop:8}}><Streak count={ps.length} req={SESSIONS_TO_UNLOCK}/></div>
-          <div style={{display:"flex",gap:8,marginTop:12}}><Stat label="Total Sessions" value={d.sessions.length}/><Stat label="Daily Pain Avg" value={da} color={pc(da)} sub={`Target: ≤${DAILY_PAIN_THRESHOLD}`}/></div>
+          <div style={{marginTop:8}}><Streak count={psReal.length} req={SESSIONS_TO_UNLOCK}/></div>
+          <div style={{display:"flex",gap:8,marginTop:12}}><Stat label="Total Sessions" value={d.sessions.filter(s=>s.type!=="checkin"&&s.type!=="restday").length}/><Stat label="Daily Pain Avg" value={da} color={pc(da)} sub={`Target: ≤${DAILY_PAIN_THRESHOLD}`}/></div>
           {ps.length>=2&&<PainTrend sessions={ps} id={`${t.key}-d`}/>}
+          {!done&&!restToday&&<button onClick={e=>{e.stopPropagation();setLogRestDayFor(t.key);}} style={{width:"100%",marginTop:14,padding:"10px",borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"rgba(255,255,255,0.02)",color:"rgba(255,255,255,0.3)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>🛌 Log Rest Day</button>}
         </div>);
       })}
       <div style={{marginTop:16,padding:16,background:"rgba(255,255,255,0.012)",borderRadius:14,border:"1px solid rgba(255,255,255,0.025)"}}>
         <div style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,0.35)",textTransform:"uppercase",letterSpacing:0.8,marginBottom:6}}>Progression Rules</div>
-        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. Rest-day check-ins count toward your pain average.</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. Rest-day check-ins feed your pain average but don't count as sessions.</div>
       </div>
     </div>);
   }
@@ -441,20 +488,20 @@ function App(){
       </div>}
       {isCur&&<>
         <div style={{display:"flex",gap:7,marginTop:14}}>
-          <Stat label="Sessions" value={pSess.length} sub={ts.phase===phases.length?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
+          <Stat label="Sessions" value={pSessReal.length} sub={ts.phase===phases.length?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
           <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={ts.phase===phases.length?`Target: ≤${DAILY_PAIN_THRESHOLD}`:`≤${DAILY_PAIN_THRESHOLD} to advance`}/>
           <Stat label="Sess. Pain" value={sAvg} color={pc(sAvg)} sub="Info only"/>
         </div>
-        <div style={{marginTop:10}}><Streak count={Math.min(pSess.length,SESSIONS_TO_UNLOCK)} req={SESSIONS_TO_UNLOCK}/></div>
+        <div style={{marginTop:10}}><Streak count={Math.min(pSessReal.length,SESSIONS_TO_UNLOCK)} req={SESSIONS_TO_UNLOCK}/></div>
         <PainTrend sessions={pSess} id={`${track}-det`}/>
       </>}
     </div>
 
     {canAdv&&!inSession&&isCur&&<button onClick={advance} style={{width:"100%",padding:"15px",borderRadius:14,border:"2px solid rgba(34,197,94,0.3)",background:"rgba(34,197,94,0.05)",color:"#22c55e",fontSize:15,fontWeight:700,cursor:"pointer",marginBottom:14,animation:"pulse 2s ease infinite"}}>🔓 Unlock Phase {ts.phase+1}: {phases.find(p=>p.id===ts.phase+1)?.name}</button>}
 
-    {!canAdv&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)>DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"13px 15px",borderRadius:12,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.1)",marginBottom:14,fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.6}}>⚠️ Sessions complete, but daily pain avg is {dAvg}/10 — needs to be ≤{DAILY_PAIN_THRESHOLD}. Keep at it.</div>}
+    {!canAdv&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)>DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"13px 15px",borderRadius:12,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.1)",marginBottom:14,fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.6}}>⚠️ Sessions complete, but daily pain avg is {dAvg}/10 — needs to be ≤{DAILY_PAIN_THRESHOLD}. Keep at it.</div>}
 
-    {ts.phase===phases.length&&pSess.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging 2-3x per week. If pain creeps back, check the flare protocol.</div></div>}
+    {ts.phase===phases.length&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging 2-3x per week. If pain creeps back, check the flare protocol.</div></div>}
 
     {inSession&&<SessionTimer startTime={sessionStartRef.current}/>}
 
@@ -490,7 +537,7 @@ function App(){
     {pSess.length>0&&isCur&&!inSession&&<div style={{marginTop:20}}>
       <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>Recent Sessions</div>
       {pSess.slice(-5).reverse().map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 13px",borderRadius:9,background:"rgba(255,255,255,0.012)",border:"1px solid rgba(255,255,255,0.025)",marginBottom:4,fontSize:11.5}}>
-        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{s.type==="checkin"&&<span style={{color:"rgba(96,165,250,0.5)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>REST DAY</span>}{s.duration>0&&<span style={{color:"rgba(255,255,255,0.2)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{Math.floor(s.duration/60)}:{String(s.duration%60).padStart(2,"0")}</span>}{s.notes&&s.type!=="checkin"&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
+        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{(s.type==="checkin"||s.type==="restday")&&<span style={{color:"rgba(96,165,250,0.5)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{s.type==="restday"?"REST DAY":"MISSED DAY"}</span>}{s.duration>0&&<span style={{color:"rgba(255,255,255,0.2)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{Math.floor(s.duration/60)}:{String(s.duration%60).padStart(2,"0")}</span>}{s.notes&&s.type!=="checkin"&&s.type!=="restday"&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
         <div style={{display:"flex",gap:10,fontFamily:"'Fira Code',monospace",flexShrink:0}}>{s.type!=="checkin"&&<span style={{color:"rgba(255,255,255,0.25)"}}>sess:<span style={{color:pc(String(s.sessionPain))}}>{s.sessionPain}</span></span>}<span style={{color:"rgba(255,255,255,0.25)"}}>daily:<span style={{color:pc(String(s.dailyPain)),fontWeight:700}}>{s.dailyPain}</span></span></div>
       </div>)}
     </div>}
