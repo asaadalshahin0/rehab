@@ -124,6 +124,33 @@ const ELBOW_PHASES = [
 function loadState(){try{const d=localStorage.getItem("rehab-v3");return d?JSON.parse(d):{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}catch{return{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}}
 function saveState(s){try{localStorage.setItem("rehab-v3",JSON.stringify(s));}catch(e){console.error(e);}}
 
+// ── SFX ──
+const _sfxCtx={c:null};
+function getSfxCtx(){
+  if(!_sfxCtx.c){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC)_sfxCtx.c=new AC();
+  }
+  if(_sfxCtx.c&&_sfxCtx.c.state==="suspended")_sfxCtx.c.resume();
+  return _sfxCtx.c;
+}
+function _tone(freq,vol,start,dur,type="sine",ctx){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(0,start);
+  g.gain.linearRampToValueAtTime(vol,start+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.start(start);o.stop(start+dur+0.01);
+}
+const sfx={
+  tick(){try{const ctx=getSfxCtx();if(!ctx)return;const t=ctx.currentTime;_tone(900,0.12,t,0.07,"sine",ctx);}catch{}},
+  restStart(){try{const ctx=getSfxCtx();if(!ctx)return;const t=ctx.currentTime;_tone(440,0.1,t,0.12,"sine",ctx);}catch{}},
+  restDone(){try{const ctx=getSfxCtx();if(!ctx)return;const t=ctx.currentTime;[0,0.11,0.22].forEach((d,i)=>_tone([523,659,784][i],0.14,t+d,0.28,"sine",ctx));}catch{}},
+  complete(){try{const ctx=getSfxCtx();if(!ctx)return;const t=ctx.currentTime;[0,0.1,0.2,0.3].forEach((d,i)=>_tone([523,659,784,1047][i],0.16,t+d,0.38,"sine",ctx));}catch{}},
+  unlock(){try{const ctx=getSfxCtx();if(!ctx)return;const t=ctx.currentTime;[0,0.09,0.18,0.27,0.36,0.45].forEach((d,i)=>_tone([523,659,784,1047,1319,1568][i],0.15,t+d,0.55,"sine",ctx));}catch{}},
+};
+
 // ── Rest Timer ──
 function RestTimer({seconds,onDone}){
   const[left,setLeft]=useState(seconds);
@@ -135,7 +162,7 @@ function RestTimer({seconds,onDone}){
     if(!active)return;
     ref.current=setInterval(()=>{
       setLeft(p=>{
-        if(p<=1){clearInterval(ref.current);setDone(true);setActive(false);if(onDone)onDone();try{navigator.vibrate&&navigator.vibrate(200);}catch{}return 0;}
+        if(p<=1){clearInterval(ref.current);setDone(true);setActive(false);if(onDone)onDone();sfx.restDone();try{navigator.vibrate&&navigator.vibrate([80,40,80]);}catch{}return 0;}
         return p-1;
       });
     },1000);
@@ -151,7 +178,7 @@ function RestTimer({seconds,onDone}){
 
   return(<div style={{padding:"10px 0",display:"flex",alignItems:"center",gap:10,justifyContent:"center"}}>
     {!active?
-      <button onClick={()=>setActive(true)} style={{padding:"6px 16px",borderRadius:8,border:"1px solid rgba(96,165,250,0.2)",background:"rgba(96,165,250,0.06)",color:"rgba(147,197,253,0.8)",fontSize:12,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>⏱ Rest {display}</button>
+      <button onClick={()=>{setActive(true);sfx.restStart();}} style={{padding:"6px 16px",borderRadius:8,border:"1px solid rgba(96,165,250,0.2)",background:"rgba(96,165,250,0.06)",color:"rgba(147,197,253,0.8)",fontSize:12,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>⏱ Rest {display}</button>
     :
       <div style={{display:"flex",alignItems:"center",gap:10,animation:"fadeIn 0.2s ease"}}>
         <div style={{width:120,height:6,borderRadius:3,background:"rgba(255,255,255,0.06)",overflow:"hidden"}}>
@@ -251,7 +278,7 @@ function ExCard({ex,checked,onToggleSet,idx,active}){
         const prevDone=s===0||!!checked[`${idx}-${s-1}`];
         const showRest=isDone&&s<ex.sets-1&&!checked[`${idx}-${s+1}`]&&ex.rest>0;
         return(<div key={s}>
-          <div onClick={active&&prevDone?()=>onToggleSet(key):undefined} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",cursor:active&&prevDone?"pointer":"default",opacity:active&&!prevDone&&!isDone?0.35:1,transition:"opacity 0.2s"}}>
+          <div onClick={active&&prevDone?()=>{if(!isDone)sfx.tick();onToggleSet(key);}:undefined} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",cursor:active&&prevDone?"pointer":"default",opacity:active&&!prevDone&&!isDone?0.35:1,transition:"opacity 0.2s"}}>
             {active&&<div style={{width:20,height:20,borderRadius:6,flexShrink:0,border:isDone?"none":"2px solid rgba(255,255,255,0.1)",background:isDone?"#22c55e":"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.15s"}}>
               {isDone&&<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L5.5 10L11 4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
             </div>}
@@ -387,12 +414,15 @@ function App(){
   const curPhase=ts?phases.find(p=>p.id===ts.phase):null;
   const dispPhase=vPhase?phases.find(p=>p.id===vPhase):curPhase;
   const pSess=ts?ts.sessions.filter(s=>s.phase===ts.phase):[];
-  const pSessReal=pSess.filter(s=>s.type!=="checkin");
+  const pSessReal=pSess.filter(s=>s.type!=="checkin"&&s.type!=="restday");
   const dAvg=pSess.length?(pSess.reduce((a,s)=>a+s.dailyPain,0)/pSess.length).toFixed(1):"—";
   const sAvg=pSessReal.length?(pSessReal.reduce((a,s)=>a+s.sessionPain,0)/pSessReal.length).toFixed(1):"—";
   const canAdv=ts&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
   const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"&&s.type!=="restday"):false;
   const pc=v=>v==="—"?"#555":parseFloat(v)<=2?"#22c55e":parseFloat(v)<=DAILY_PAIN_THRESHOLD?"#4ade80":parseFloat(v)<=5?"#eab308":"#ef4444";
+  const sessWithDur=pSessReal.filter(s=>s.duration>0);
+  const avgDurSec=sessWithDur.length?Math.round(sessWithDur.reduce((a,s)=>a+s.duration,0)/sessWithDur.length):null;
+  const fmtDur=sec=>sec?`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`:"—";
 
   // All sets checked?
   const exercises=dispPhase?.exercises||[];
@@ -404,11 +434,12 @@ function App(){
     const sess={date:TODAY(),sessionPain:sPain,dailyPain:dPain,phase:ts.phase,notes:notes.trim(),setsCompleted:Object.values(checked).filter(Boolean).length,duration:durSec};
     const newS=[...ts.sessions.filter(s=>!(s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin")),sess];
     persist({...state,[track]:{...ts,sessions:newS}});
+    sfx.complete();
     setInSession(false);setChecked({});setSPain(3);setDPain(3);setNotes("");sessionStartRef.current=null;
     history.back();
   };
 
-  const advance=()=>{const n=ts.phase+1;persist({...state,[track]:{...ts,phase:n}});setUnlock(n);setTimeout(()=>setUnlock(null),3500);};
+  const advance=()=>{const n=ts.phase+1;persist({...state,[track]:{...ts,phase:n}});sfx.unlock();setUnlock(n);setTimeout(()=>setUnlock(null),3500);};
   const reset=()=>{if(confirm("Reset all progress for this track?")){persist({...state,[track]:{phase:1,sessions:[]}});setVPhase(null);}};
   const root={minHeight:"100vh",minHeight:"100dvh",background:"#0a0a0f",color:"#fff",fontFamily:"'Outfit',sans-serif",maxWidth:460,margin:"0 auto",padding:"0 16px 100px"};
 
@@ -430,7 +461,7 @@ function App(){
       {[{key:"knee",label:"Right Knee",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const ps=d.sessions.filter(s=>s.phase===d.phase);
-        const psReal=ps.filter(s=>s.type!=="checkin");
+        const psReal=ps.filter(s=>s.type!=="checkin"&&s.type!=="restday");
         const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin"&&s.type!=="restday");
         const restToday=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type==="restday");
         const da=ps.length?(ps.reduce((a,s)=>a+s.dailyPain,0)/ps.length).toFixed(1):"—";
@@ -491,6 +522,7 @@ function App(){
           <Stat label="Sessions" value={pSessReal.length} sub={ts.phase===phases.length?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
           <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={ts.phase===phases.length?`Target: ≤${DAILY_PAIN_THRESHOLD}`:`≤${DAILY_PAIN_THRESHOLD} to advance`}/>
           <Stat label="Sess. Pain" value={sAvg} color={pc(sAvg)} sub="Info only"/>
+          <Stat label="Avg Time" value={fmtDur(avgDurSec)} sub="per session"/>
         </div>
         <div style={{marginTop:10}}><Streak count={Math.min(pSessReal.length,SESSIONS_TO_UNLOCK)} req={SESSIONS_TO_UNLOCK}/></div>
         <PainTrend sessions={pSess} id={`${track}-det`}/>
@@ -537,7 +569,7 @@ function App(){
     {pSess.length>0&&isCur&&!inSession&&<div style={{marginTop:20}}>
       <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>Recent Sessions</div>
       {pSess.slice(-5).reverse().map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 13px",borderRadius:9,background:"rgba(255,255,255,0.012)",border:"1px solid rgba(255,255,255,0.025)",marginBottom:4,fontSize:11.5}}>
-        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{(s.type==="checkin"||s.type==="restday")&&<span style={{color:"rgba(96,165,250,0.5)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{s.type==="restday"?"REST DAY":"MISSED DAY"}</span>}{s.duration>0&&<span style={{color:"rgba(255,255,255,0.2)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{Math.floor(s.duration/60)}:{String(s.duration%60).padStart(2,"0")}</span>}{s.notes&&s.type!=="checkin"&&s.type!=="restday"&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
+        <div style={{minWidth:0,flex:1}}><span style={{color:"rgba(255,255,255,0.4)",fontFamily:"'Fira Code',monospace"}}>{s.date}</span>{(s.type==="checkin"||s.type==="restday")&&<span style={{color:"rgba(96,165,250,0.5)",marginLeft:6,fontSize:10,fontFamily:"'Fira Code',monospace"}}>{s.type==="restday"?"REST DAY":"MISSED DAY"}</span>}{s.duration>0&&<span style={{color:"rgba(147,197,253,0.65)",marginLeft:8,fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,background:"rgba(96,165,250,0.07)",padding:"1px 6px",borderRadius:4}}>⏱ {Math.floor(s.duration/60)}:{String(s.duration%60).padStart(2,"0")}</span>}{s.notes&&s.type!=="checkin"&&s.type!=="restday"&&<span style={{color:"rgba(255,255,255,0.18)",marginLeft:8,fontStyle:"italic"}}>{s.notes}</span>}</div>
         <div style={{display:"flex",gap:10,fontFamily:"'Fira Code',monospace",flexShrink:0}}>{s.type!=="checkin"&&<span style={{color:"rgba(255,255,255,0.25)"}}>sess:<span style={{color:pc(String(s.sessionPain))}}>{s.sessionPain}</span></span>}<span style={{color:"rgba(255,255,255,0.25)"}}>daily:<span style={{color:pc(String(s.dailyPain)),fontWeight:700}}>{s.dailyPain}</span></span></div>
       </div>)}
     </div>}
