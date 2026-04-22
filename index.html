@@ -415,7 +415,8 @@ function App(){
   const dispPhase=vPhase?phases.find(p=>p.id===vPhase):curPhase;
   const pSess=ts?ts.sessions.filter(s=>s.phase===ts.phase):[];
   const pSessReal=pSess.filter(s=>s.type!=="checkin"&&s.type!=="restday");
-  const dAvg=pSess.length?(pSess.reduce((a,s)=>a+s.dailyPain,0)/pSess.length).toFixed(1):"—";
+  const dAvgSess=pSess.slice(-SESSIONS_TO_UNLOCK);
+  const dAvg=dAvgSess.length?(dAvgSess.reduce((a,s)=>a+s.dailyPain,0)/dAvgSess.length).toFixed(1):"—";
   const sAvg=pSessReal.length?(pSessReal.reduce((a,s)=>a+s.sessionPain,0)/pSessReal.length).toFixed(1):"—";
   const canAdv=ts&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
   const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"&&s.type!=="restday"):false;
@@ -464,7 +465,7 @@ function App(){
         const psReal=ps.filter(s=>s.type!=="checkin"&&s.type!=="restday");
         const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin"&&s.type!=="restday");
         const restToday=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type==="restday");
-        const da=ps.length?(ps.reduce((a,s)=>a+s.dailyPain,0)/ps.length).toFixed(1):"—";
+        const daS=ps.slice(-SESSIONS_TO_UNLOCK);const da=daS.length?(daS.reduce((a,s)=>a+s.dailyPain,0)/daS.length).toFixed(1):"—";
         return(<div key={t.key} onClick={()=>goToTrack(t.key)}
           style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.045)",borderRadius:18,padding:"20px 18px",marginBottom:12,cursor:"pointer",transition:"all 0.2s",animation:`fadeIn 0.4s ease both`,animationDelay:`${(ti+1)*80}ms`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
