@@ -357,7 +357,7 @@ function App(){
   const[dPain,setDPain]=useState(3);
   const[notes,setNotes]=useState("");
   const[unlock,setUnlock]=useState(null);
-  const[showBreakdown,setShowBreakdown]=useState(false);
+  const[showBreakdown,setShowBreakdown]=useState(null);
   const[vPhase,setVPhase]=useState(null);
   const[skipCheck,setSkipCheck]=useState(null);
   const[logRestDayFor,setLogRestDayFor]=useState(null);
@@ -461,7 +461,7 @@ function App(){
         <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Your Recovery</h1>
         <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginTop:6}}>{new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
       </div>
-      {[{key:"knee",label:"Right Knee",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
+      {[{key:"knee",label:"Right Knee Bro",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const ps=d.sessions.filter(s=>s.phase===d.phase);
         const psReal=ps.filter(s=>s.type!=="checkin"&&s.type!=="restday");
@@ -477,7 +477,7 @@ function App(){
           </div>
           <div style={{fontSize:11,color:"rgba(255,255,255,0.25)",fontFamily:"'Fira Code',monospace",marginTop:12}}>Phase {d.phase}/{t.ph.length} · {phase?.name}</div>
           <div style={{marginTop:8}}><Streak count={psReal.length} req={SESSIONS_TO_UNLOCK}/></div>
-          <div style={{display:"flex",gap:8,marginTop:12}}><Stat label="Total Sessions" value={d.sessions.filter(s=>s.type!=="checkin"&&s.type!=="restday").length}/><Stat label="Daily Pain Avg" value={da} color={pc(da)} sub={`Target: ≤${DAILY_PAIN_THRESHOLD}`}/></div>
+          <div style={{display:"flex",gap:8,marginTop:12}}><Stat label="Total Sessions" value={d.sessions.filter(s=>s.type!=="checkin"&&s.type!=="restday").length}/><Stat label="Daily Pain Avg" value={da} color={pc(da)} sub={`Target: <=3`} onClick={daS.length?e=>{e.stopPropagation();setShowBreakdown(daS);}:undefined}/></div>
           {ps.length>=2&&<PainTrend sessions={ps} id={`${t.key}-d`}/>}
           {!done&&!restToday&&<button onClick={e=>{e.stopPropagation();setLogRestDayFor(t.key);}} style={{width:"100%",marginTop:14,padding:"10px",borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"rgba(255,255,255,0.02)",color:"rgba(255,255,255,0.3)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>🛌 Log Rest Day</button>}
         </div>);
@@ -491,6 +491,7 @@ function App(){
 
   // TRACK DETAIL
   return(<div style={root}>
+    {showBreakdown&&<PainBreakdownModal sessions={showBreakdown} onClose={()=>setShowBreakdown(null)} threshold={DAILY_PAIN_THRESHOLD} pc={pc}/> }
     {unlock&&<div onClick={()=>setUnlock(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,animation:"fadeIn 0.2s ease"}}>
       <div style={{background:"#111118",border:"1.5px solid rgba(34,197,94,0.25)",borderRadius:22,padding:"44px 32px",textAlign:"center",maxWidth:300,animation:"burst 0.5s ease"}}>
         <div style={{fontSize:52,marginBottom:14}}>🔓</div><div style={{fontSize:22,fontWeight:800}}>Phase {unlock}</div>
@@ -523,7 +524,7 @@ function App(){
       {isCur&&<>
         <div style={{display:"flex",gap:7,marginTop:14}}>
           <Stat label="Sessions" value={pSessReal.length} sub={ts.phase===phases.length?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
-          <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={ts.phase===phases.length?`Target: ≤${DAILY_PAIN_THRESHOLD}`:`≤${DAILY_PAIN_THRESHOLD} to advance`}/>
+          <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={ts.phase===phases.length?`Target: <=3`:`<=3 to advance`} onClick={dAvgSess.length?()=>setShowBreakdown(dAvgSess):undefined}/>
           <Stat label="Sess. Pain" value={sAvg} color={pc(sAvg)} sub="Info only"/>
           <Stat label="Avg Time" value={fmtDur(avgDurSec)} sub="per session"/>
         </div>
