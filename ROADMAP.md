@@ -6,9 +6,12 @@
 - Let logged pain data be corrected without resetting progress.
 
 ## Current Priority
-- Deploy `rehab-v15` and verify the installed PWA shows the Phase 5 flare curricula.
+- Deploy `rehab-v16` and verify the installed PWA shows the selectable PAIN exercise phase.
 
 ## Done
+- Replaced the informational flare curriculum card with a real PAIN phase.
+- PAIN phase can be selected after Phase 5 and uses normal exercise cards, set completion, rest timers, post-session pain logging, and recent-session history.
+- Bumped service-worker cache from `rehab-v15` to `rehab-v16`.
 - Replaced Phase 5 "If Pain Returns" text with staged knee and elbow return-from-flare curricula.
 - Added gates, rules, and stop/red-flag notes for each flare curriculum.
 - Bumped service-worker cache from `rehab-v14` to `rehab-v15`.

@@ -80,12 +80,14 @@ const KNEE_PHASES = [
     {name:"Drop Jump (Low Box)",sets:2,reps:6,unit:"reps",rest:90,notes:"NEW — Step off 6-8 in box, land, immediately jump up.",pain:pr("0-1/10 on landing","Stop immediately if any tendon pain on landing.")},
     {name:"Lateral Lunge",sets:2,reps:8,unit:"reps/side",rest:60,notes:"NEW — Trains the tendon in a different plane.",pain:pr("0-2/10","Stop if >2. Reduce depth.")},
     {name:"Single-Leg Calf Raise",sets:3,reps:15,unit:"reps/side",rest:45,notes:"Add weight when bodyweight is easy.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
-  ],flareCurriculum:{trigger:"Use this when daily-life knee pain climbs above 2/10, landing feels sharp, or pain is worse the morning after plyometrics.",stages:[
-    {window:"Days 1-3",title:"Calm the tendon",goal:"Kill the spike without fully resting.",do:["Remove pogo hops, drop jumps, lateral lunges, and weighted split squats.","Spanish Squat holds: 4 x 45 sec, 1-2x/day.","Easy walking only if it does not increase pain later that day."],gate:"Move on when normal walking/stairs are <=2/10 for 24 hours."},
-    {window:"Days 4-7",title:"Reload isometrics + slow strength",goal:"Put useful load back in without bounce.",do:["Spanish Squat holds: 3 x 45 sec.","Wall Sit: 3 x 45 sec.","Slow split squat or leg extension: 2 x 8, very controlled, no added weight."],gate:"Move on after 2 sessions with pain <=3/10 during and no next-day spike."},
-    {window:"Week 2",title:"Return to Phase 3 strength",goal:"Earn single-leg capacity before impact.",do:["Decline single-leg squat: 3 x 8.","Step-up or step-down: 3 x 8/side.","Single-leg calf raise: 3 x 12/side."],gate:"Move on when daily pain average is <=2/10 for 3 days."},
-    {window:"Week 3+",title:"Reintroduce energy storage",goal:"Add bounce in tiny doses.",do:["Double-leg pogo hops: 2 x 10, small and quiet.","No single-leg pogos or drop jumps until double-leg hops are pain-free for 3 sessions.","Resume Phase 5 one exercise at a time, never all plyos on day one."],gate:"If pain returns above 2/10, drop back one stage for 3-5 days."},
-  ],rules:["Pain during rehab can be 0-3/10 if it settles the same day.","Pain above 4/10 or a worse next morning means the last load was too much.","If there is no improvement after 14 days, run Phase 3 for a full week before Phase 5."],redFlags:["Sharp catching pain, swelling, buckling, or pain that keeps rising despite unloading = stop and get checked."]}},
+  ]},
+  {id:6,name:"If Pain Returns",flarePhase:true,freq:"Use for 3-7 days when daily knee pain climbs above 2/10, landing feels sharp, or the next morning is worse.",rationale:"This is the reset phase: remove impact, keep tendon-safe load, and earn your way back to Phase 5 instead of guessing.",warmup:"2 min easy walking or marching. No hops, no jogging, no loaded deep knee bend in the warmup.",exercises:[
+    {name:"Spanish Squat Pain-Relief Hold",sets:4,duration:45,unit:"sec",rest:45,notes:"Band behind knees. Sit back, keep torso tall. This is the anchor exercise while pain is up.",pain:pr("0-4/10 acceptable if it settles","Stop if sharp or rising. Reduce depth or band tension.")},
+    {name:"Shallow Wall Sit",sets:3,duration:45,unit:"sec",rest:60,notes:"Stay higher than normal. The goal is calm load, not proving depth.",pain:pr("0-3/10 during hold","Stop if >3 or worse after the set.")},
+    {name:"Slow Bodyweight Split Squat",sets:2,reps:8,unit:"reps/side",rest:90,notes:"3-sec lower, shallow range. Use hands for balance. No dumbbells.",pain:pr("0-3/10, dull only","Stop if sharp, unstable, or >3.")},
+    {name:"Low Step-Up",sets:2,reps:8,unit:"reps/side",rest:60,notes:"Low box only. Smooth up, slow down. If stairs hurt today, skip depth and use a lower step.",pain:pr("0-2/10 preferred","Stop if it changes your gait or lingers.")},
+    {name:"Double-Leg Pogo Re-Test",sets:2,reps:10,unit:"reps",rest:60,notes:"Only do this when daily pain is <=2/10. Small, quiet bounces. This is the exit test back toward Phase 5.",pain:pr("0-1/10 only","Any tendon pain = stop and repeat this phase next session.")},
+  ]},
 ];
 
 const ELBOW_PHASES = [
@@ -122,12 +124,14 @@ const ELBOW_PHASES = [
     {name:"Farmer's Carry (Heavy)",sets:3,duration:45,unit:"sec",rest:60,notes:"Progress to heavier weight and longer holds.",pain:pr("0-1/10 in elbow","Grip fatigue fine. Elbow pain is not.")},
     {name:"Ball Slam (Heavy)",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 8-10lb ball. Full power slams.",pain:pr("0-1/10 in elbow","Stop if any medial elbow pain on impact.")},
     {name:"Wrist Roller",sets:2,reps:3,unit:"full rolls",rest:60,notes:"NEW — 5-10lb. Roll up (flexion), roll down (extension).",pain:pr("0-2/10","Stop if medial elbow flares.")},
-  ],flareCurriculum:{trigger:"Use this when medial elbow pain returns with gripping, wrist flexion, ball slams, or bag impact.",stages:[
-    {window:"Days 1-3",title:"Remove impact",goal:"Get pain quiet while keeping tendon signal.",do:["Stop bag work, ball slams, towel wringing, and heavy carries.","Isometric Wrist Flexion Hold: 4 x 40 sec, 1-2x/day.","Light wrist circles and finger extensions only."],gate:"Move on when daily elbow pain is <=2/10 and gripping a cup is calm."},
-    {window:"Days 4-7",title:"Rebuild tendon load",goal:"Bring back slow flexor work.",do:["Wrist Flexion Eccentric: 3 x 10, 5-sec lower.","Isometric Wrist Extension Hold: 2 x 30 sec.","Reverse Wrist Curl: 2 x 12, light and smooth."],gate:"Move on after 2 sessions with pain <=3/10 and no next-day increase."},
-    {window:"Week 2",title:"Grip + rotation bridge",goal:"Prepare the elbow for force again.",do:["Tyler Twist: 3 x 10.","Pronation/Supination: 2 x 12/dir.","Farmer's Carry: 2 x 20 sec, moderate-light."],gate:"Move on when carries and Tyler Twists are <=2/10 for 3 sessions."},
-    {window:"Week 3+",title:"Controlled impact return",goal:"Layer impact back in before combos.",do:["Open-palm bag taps: 2 x 20 sec.","Single shots only: 3 x 8 at 30-50% power.","Add light combos only after singles are pain-free for 3 sessions."],gate:"If sharp impact pain returns, stay on bag taps for 2 more weeks."},
-  ],rules:["No impact work while daily pain is above 2/10.","Grip fatigue is fine; medial elbow pain above 3/10 is not.","Return to Phase 5 by adding one impact exercise per session."],redFlags:["Numbness, tingling, spreading forearm pain, or sharp pain with light daily gripping = stop and get checked."]}},
+  ]},
+  {id:6,name:"If Pain Returns",flarePhase:true,freq:"Use for 3-7 days when medial elbow pain returns with gripping, wrist flexion, ball slams, or bag impact.",rationale:"This is the reset phase: remove impact, reload the tendon slowly, and re-test grip before returning to Phase 5.",warmup:"1-2 min wrist circles, open/close fist 20 times, then 10 gentle finger spreads. No bag work in the warmup.",exercises:[
+    {name:"Isometric Wrist Flexion Hold",sets:4,duration:40,unit:"sec",rest:45,notes:"Palm up, hold weight dead still. Use a load that feels firm but controlled.",pain:pr("0-4/10 acceptable if it settles","Stop if sharp or if pain climbs during the hold.")},
+    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Lift with the left hand, lower with the right over 5 seconds. Start lighter than Phase 5.",pain:pr("0-3/10 during lowering","Stop if >3 or sharp.")},
+    {name:"Isometric Wrist Extension Hold",sets:2,duration:30,unit:"sec",rest:45,notes:"Palm down, hold still. This balances the flexor work without impact.",pain:pr("0-2/10 in elbow","Stop if medial elbow flares.")},
+    {name:"Tyler Twist",sets:2,reps:10,unit:"reps",rest:60,notes:"Green FlexBar or easier. Smooth controlled reps, no grinding.",pain:pr("0-3/10 dull only","Stop if sharp or worse after the set.")},
+    {name:"Open-Palm Bag Tap Re-Test",sets:2,duration:20,unit:"sec",rest:60,notes:"Only do this when daily pain is <=2/10. Open palm, light contact, no closed-fist shots.",pain:pr("0-1/10 only","Any sharp impact pain = stop and repeat this phase next session.")},
+  ]},
 ];
 
 // Storage
@@ -264,40 +268,9 @@ function PainProtocol({pain}){
   </div>);
 }
 
-function FlareCurriculum({curriculum}){
-  if(!curriculum)return null;
-  return(<div style={{marginTop:12,padding:"14px 14px 15px",background:"rgba(251,146,60,0.04)",border:"1px solid rgba(251,146,60,0.12)",borderRadius:12}}>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-      <span style={{fontSize:14,flexShrink:0}}>🛟</span>
-      <span style={{fontSize:10,fontWeight:700,color:"rgba(251,191,36,0.9)",textTransform:"uppercase",letterSpacing:0.5,fontFamily:"'Fira Code',monospace"}}>If Pain Returns</span>
-    </div>
-    <div style={{fontSize:12,color:"rgba(255,255,255,0.42)",lineHeight:1.6,marginBottom:12}}>{curriculum.trigger}</div>
-    <div style={{display:"flex",flexDirection:"column",gap:8}}>
-      {curriculum.stages.map((stage,i)=><div key={i} style={{padding:"11px 12px",borderRadius:10,background:"rgba(0,0,0,0.18)",border:"1px solid rgba(255,255,255,0.045)"}}>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:10,marginBottom:6}}>
-          <div style={{fontSize:13,fontWeight:700,color:"rgba(255,255,255,0.76)"}}>{stage.title}</div>
-          <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(251,191,36,0.7)",whiteSpace:"nowrap"}}>{stage.window}</div>
-        </div>
-        <div style={{fontSize:11.5,color:"rgba(255,255,255,0.32)",lineHeight:1.5,marginBottom:7}}>{stage.goal}</div>
-        <div style={{display:"flex",flexDirection:"column",gap:5,marginBottom:8}}>
-          {stage.do.map((item,j)=><div key={j} style={{display:"flex",gap:7,alignItems:"flex-start",fontSize:11.5,color:"rgba(255,255,255,0.52)",lineHeight:1.45}}>
-            <span style={{fontSize:10,color:"rgba(34,197,94,0.8)",marginTop:2,flexShrink:0}}>✓</span>
-            <span>{item}</span>
-          </div>)}
-        </div>
-        <div style={{fontSize:10.5,fontFamily:"'Fira Code',monospace",color:"rgba(147,197,253,0.72)",lineHeight:1.45,background:"rgba(96,165,250,0.055)",border:"1px solid rgba(96,165,250,0.08)",borderRadius:7,padding:"7px 8px"}}>Gate: {stage.gate}</div>
-      </div>)}
-    </div>
-    <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
-      {curriculum.rules.map((rule,i)=><div key={i} style={{fontSize:10.8,color:"rgba(255,255,255,0.38)",lineHeight:1.45}}><span style={{color:"rgba(251,191,36,0.75)",fontFamily:"'Fira Code',monospace",fontWeight:700}}>RULE {i+1}</span> · {rule}</div>)}
-      {curriculum.redFlags.map((flag,i)=><div key={`r-${i}`} style={{fontSize:10.8,color:"rgba(248,113,113,0.72)",lineHeight:1.45}}><span style={{fontFamily:"'Fira Code',monospace",fontWeight:700}}>STOP</span> · {flag}</div>)}
-    </div>
-  </div>);
-}
-
 // ── Exercise Card with individual set checkboxes ──
 function ExCard({ex,checked,onToggleSet,idx,active}){
-  const setDesc=ex.duration?`${ex.duration}s ${ex.unit}`:`${ex.reps} ${ex.unit}${ex.holdSec?` · ${ex.holdSec}s hold`:""}`;
+  const setDesc=ex.duration?`${ex.duration}${(ex.unit||"sec").replace(/^sec/,"s")}`:`${ex.reps} ${ex.unit}${ex.holdSec?` · ${ex.holdSec}s hold`:""}`;
   const isNew=ex.notes?.startsWith("NEW");
   const allDone=Array.from({length:ex.sets},(_,s)=>checked[`${idx}-${s}`]).every(Boolean);
 
@@ -497,15 +470,17 @@ function App(){
 
   const phases=track==="knee"?KNEE_PHASES:ELBOW_PHASES;
   const ts=track?state[track]:null;
+  const regularPhaseCount=phases.filter(p=>!p.flarePhase).length;
+  const activePhaseId=vPhase||ts?.phase;
   const curPhase=ts?phases.find(p=>p.id===ts.phase):null;
   const dispPhase=vPhase?phases.find(p=>p.id===vPhase):curPhase;
-  const pSess=ts?withRefs(ts.sessions,track).filter(s=>s.phase===ts.phase):[];
+  const pSess=ts?withRefs(ts.sessions,track).filter(s=>s.phase===activePhaseId):[];
   const pSessReal=pSess.filter(s=>s.type!=="checkin"&&s.type!=="restday");
   const dAvgSess=pSess.slice(-SESSIONS_TO_UNLOCK);
   const dAvg=dAvgSess.length?(dAvgSess.reduce((a,s)=>a+s.dailyPain,0)/dAvgSess.length).toFixed(1):"—";
   const sAvg=pSessReal.length?(pSessReal.reduce((a,s)=>a+s.sessionPain,0)/pSessReal.length).toFixed(1):"—";
-  const canAdv=ts&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<phases.length;
-  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin"&&s.type!=="restday"):false;
+  const canAdv=ts&&!dispPhase?.flarePhase&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&ts.phase<regularPhaseCount;
+  const doneToday=ts?ts.sessions.some(s=>s.date===TODAY()&&s.phase===activePhaseId&&s.type!=="checkin"&&s.type!=="restday"):false;
   const pc=v=>v==="—"?"#555":parseFloat(v)<=2?"#22c55e":parseFloat(v)<=DAILY_PAIN_THRESHOLD?"#4ade80":parseFloat(v)<=5?"#eab308":"#ef4444";
   const sessWithDur=pSessReal.filter(s=>s.duration>0);
   const avgDurSec=sessWithDur.length?Math.round(sessWithDur.reduce((a,s)=>a+s.duration,0)/sessWithDur.length):null;
@@ -514,12 +489,12 @@ function App(){
   // All sets checked?
   const exercises=dispPhase?.exercises||[];
   const allChecked=exercises.every((ex,ei)=>Array.from({length:ex.sets},(_,s)=>checked[`${ei}-${s}`]).every(Boolean));
-  const isCur=(vPhase||ts?.phase)===ts?.phase;
+  const isCur=activePhaseId===ts?.phase||(!!dispPhase?.flarePhase&&ts?.phase>=regularPhaseCount);
 
   const complete=()=>{
     const durSec=sessionStartRef.current?Math.round((Date.now()-sessionStartRef.current)/1000):0;
-    const sess={date:TODAY(),sessionPain:sPain,dailyPain:dPain,phase:ts.phase,notes:notes.trim(),setsCompleted:Object.values(checked).filter(Boolean).length,duration:durSec};
-    const newS=[...ts.sessions.filter(s=>!(s.date===TODAY()&&s.phase===ts.phase&&s.type!=="checkin")),sess];
+    const sess={date:TODAY(),sessionPain:sPain,dailyPain:dPain,phase:activePhaseId,notes:notes.trim(),setsCompleted:Object.values(checked).filter(Boolean).length,duration:durSec};
+    const newS=[...ts.sessions.filter(s=>!(s.date===TODAY()&&s.phase===activePhaseId&&s.type!=="checkin")),sess];
     persist({...state,[track]:{...ts,sessions:newS}});
     sfx.complete();
     setInSession(false);setChecked({});setSPain(3);setDPain(3);setNotes("");sessionStartRef.current=null;
@@ -549,6 +524,7 @@ function App(){
       </div>
       {[{key:"knee",label:"Right Knee Bro",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
+        const regCount=t.ph.filter(p=>!p.flarePhase).length;
         const ps=withRefs(d.sessions,t.key).filter(s=>s.phase===d.phase);
         const psReal=ps.filter(s=>s.type!=="checkin"&&s.type!=="restday");
         const done=d.sessions.some(s=>s.date===TODAY()&&s.phase===d.phase&&s.type!=="checkin"&&s.type!=="restday");
@@ -561,7 +537,7 @@ function App(){
             {done&&<span style={{fontSize:10,fontFamily:"'Fira Code',monospace",fontWeight:700,color:"#22c55e",background:"rgba(34,197,94,0.07)",padding:"3px 8px",borderRadius:6}}>DONE TODAY</span>}
             {restToday&&!done&&<span style={{fontSize:10,fontFamily:"'Fira Code',monospace",fontWeight:700,color:"rgba(96,165,250,0.7)",background:"rgba(96,165,250,0.07)",padding:"3px 8px",borderRadius:6}}>REST TODAY</span>}
           </div>
-          <div style={{fontSize:11,color:"rgba(255,255,255,0.25)",fontFamily:"'Fira Code',monospace",marginTop:12}}>Phase {d.phase}/{t.ph.length} · {phase?.name}</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,0.25)",fontFamily:"'Fira Code',monospace",marginTop:12}}>Phase {d.phase}/{regCount} · {phase?.name}</div>
           <div style={{marginTop:8}}><Streak count={psReal.length} req={SESSIONS_TO_UNLOCK}/></div>
           <div style={{display:"flex",gap:8,marginTop:12}}><Stat label="Total Sessions" value={d.sessions.filter(s=>s.type!=="checkin"&&s.type!=="restday").length}/><Stat label="Daily Pain Avg" value={da} color={pc(da)} sub={`Target: <=3`} onClick={daS.length?e=>{e.stopPropagation();setShowBreakdown(daS);}:undefined}/></div>
           {ps.length>=2&&<PainTrend sessions={ps} id={`${t.key}-d`}/>}
@@ -592,23 +568,22 @@ function App(){
       <div><div style={{fontSize:16,fontWeight:700}}>{track==="knee"?"🦵 Right Knee":"💪 Right Elbow"}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>{track==="knee"?"Patellar Tendinopathy":"Golfer's Elbow (Impact)"}</div></div>
     </div>
 
-    <TL total={phases.length} cur={ts.phase}/>
+    <TL total={regularPhaseCount} cur={Math.min(ts.phase,regularPhaseCount)}/>
 
     <div style={{display:"flex",gap:5,marginBottom:12,overflowX:"auto",paddingBottom:2}}>
-      {phases.map(p=>{const locked=p.id>ts.phase,active=(vPhase||ts.phase)===p.id;
-        return <button key={p.id} onClick={()=>!locked&&setVPhase(p.id)} disabled={locked} style={{padding:"5px 11px",borderRadius:7,border:"none",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:locked?"not-allowed":"pointer",background:active?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.015)",color:locked?"rgba(255,255,255,0.08)":active?"#fff":"rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>{locked?"🔒 ":""}P{p.id}</button>;
+      {phases.map(p=>{const locked=p.flarePhase?ts.phase<regularPhaseCount:p.id>ts.phase,active=activePhaseId===p.id;
+        return <button key={p.id} onClick={()=>!locked&&setVPhase(p.id)} disabled={locked} style={{padding:"5px 11px",borderRadius:7,border:"none",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:locked?"not-allowed":"pointer",background:active?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.015)",color:locked?"rgba(255,255,255,0.08)":active?"#fff":"rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>{locked?"🔒 ":""}{p.flarePhase?"PAIN":`P${p.id}`}</button>;
       })}
     </div>
 
     <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:16,padding:18,marginBottom:14,animation:"fadeIn 0.3s ease"}}>
-      <div style={{fontSize:15,fontWeight:700}}>Phase {dispPhase?.id}: {dispPhase?.name}</div>
+      <div style={{fontSize:15,fontWeight:700}}>{dispPhase?.flarePhase?"Pain Return Phase":`Phase ${dispPhase?.id}`}: {dispPhase?.name}</div>
       <div style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:6,lineHeight:1.6,borderLeft:"2px solid rgba(255,255,255,0.05)",paddingLeft:12}}>{dispPhase?.rationale}</div>
       <div style={{display:"flex",alignItems:"flex-start",gap:8,marginTop:12,padding:"10px 12px",background:"rgba(96,165,250,0.04)",border:"1px solid rgba(96,165,250,0.08)",borderRadius:10}}><span style={{fontSize:14,flexShrink:0}}>📅</span><div style={{fontSize:12,color:"rgba(147,197,253,0.7)",lineHeight:1.5}}>{dispPhase?.freq}</div></div>
-      <FlareCurriculum curriculum={dispPhase?.flareCurriculum}/>
       {isCur&&<>
         <div style={{display:"flex",gap:7,marginTop:14}}>
-          <Stat label="Sessions" value={pSessReal.length} sub={ts.phase===phases.length?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
-          <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={ts.phase===phases.length?`Target: <=3`:`<=3 to advance`} onClick={dAvgSess.length?()=>setShowBreakdown(dAvgSess):undefined}/>
+          <Stat label="Sessions" value={pSessReal.length} sub={dispPhase?.flarePhase?"pain return":ts.phase===regularPhaseCount?"maintenance":`of ${SESSIONS_TO_UNLOCK}`}/>
+          <Stat label="Daily Pain" value={dAvg} color={pc(dAvg)} sub={dispPhase?.flarePhase?`Target: <=2`:ts.phase===regularPhaseCount?`Target: <=3`:`<=3 to advance`} onClick={dAvgSess.length?()=>setShowBreakdown(dAvgSess):undefined}/>
           <Stat label="Sess. Pain" value={sAvg} color={pc(sAvg)} sub="Info only"/>
           <Stat label="Avg Time" value={fmtDur(avgDurSec)} sub="per session"/>
         </div>
@@ -619,9 +594,9 @@ function App(){
 
     {canAdv&&!inSession&&isCur&&<button onClick={advance} style={{width:"100%",padding:"15px",borderRadius:14,border:"2px solid rgba(34,197,94,0.3)",background:"rgba(34,197,94,0.05)",color:"#22c55e",fontSize:15,fontWeight:700,cursor:"pointer",marginBottom:14,animation:"pulse 2s ease infinite"}}>🔓 Unlock Phase {ts.phase+1}: {phases.find(p=>p.id===ts.phase+1)?.name}</button>}
 
-    {!canAdv&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)>DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"13px 15px",borderRadius:12,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.1)",marginBottom:14,fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.6}}>⚠️ Sessions complete, but daily pain avg is {dAvg}/10 — needs to be ≤{DAILY_PAIN_THRESHOLD}. Keep at it.</div>}
+    {!dispPhase?.flarePhase&&!canAdv&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)>DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"13px 15px",borderRadius:12,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.1)",marginBottom:14,fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:1.6}}>⚠️ Sessions complete, but daily pain avg is {dAvg}/10 — needs to be ≤{DAILY_PAIN_THRESHOLD}. Keep at it.</div>}
 
-    {ts.phase===phases.length&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging 2-3x per week. If pain creeps back, check the flare protocol.</div></div>}
+    {ts.phase===regularPhaseCount&&!dispPhase?.flarePhase&&pSessReal.length>=SESSIONS_TO_UNLOCK&&parseFloat(dAvg)<=DAILY_PAIN_THRESHOLD&&isCur&&!inSession&&<div style={{padding:"16px",borderRadius:14,background:"rgba(34,197,94,0.04)",border:"1.5px solid rgba(34,197,94,0.15)",marginBottom:14}}><div style={{fontSize:15,fontWeight:700,color:"#22c55e",marginBottom:6}}>🏆 Maintenance Mode</div><div style={{fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.7}}>Keep logging 2-3x per week. If pain creeps back, use the PAIN phase.</div></div>}
 
     {inSession&&<SessionTimer startTime={sessionStartRef.current}/>}
 
