@@ -4,11 +4,16 @@
 - Keep the static rehab tracker usable offline.
 - Preserve local-only progress storage.
 - Let logged pain data be corrected without resetting progress.
+- Provide a knee-only PFPS progression with combined hip and knee strengthening.
 
 ## Current Priority
-- Deploy `rehab-v16` and verify the installed PWA shows the selectable PAIN exercise phase.
+- Validate and deploy the knee-only `rehab-v17-pfps` rewrite, then verify the live GitHub Pages app.
 
 ## Done
+- Removed the elbow track and all golfer's-elbow protocol content.
+- Replaced the patellar-tendinopathy program with four staged PFPS phases plus an always-available flare phase.
+- Added symptom-guided load rules, next-morning response guidance, and clinician-assessment warning signs.
+- Added a one-time reset that removes all prior exercise history and starts PFPS tracking at Phase 1 with a new local-only storage key.
 - Replaced the informational flare curriculum card with a real PAIN phase.
 - PAIN phase can be selected after Phase 5 and uses normal exercise cards, set completion, rest timers, post-session pain logging, and recent-session history.
 - Bumped service-worker cache from `rehab-v15` to `rehab-v16`.
