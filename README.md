@@ -1,8 +1,11 @@
 # Rehab Protocol PWA
 
-Knee-only patellofemoral pain syndrome (PFPS) rehab tracker.
+Local-only tracker with two independent pathways:
 
-The protocol uses staged hip- and knee-targeted strengthening, symptom-guided load management, daily-life pain tracking, and a flare option available from every phase. It is educational support and does not replace an individualized assessment by a physical therapist or other qualified clinician.
+- Right knee: patellofemoral pain syndrome (PFPS), using staged hip- and knee-targeted strengthening.
+- Right forearm: chronic pronator teres strain, using comfortable rotation, isometrics, supported pronation loading, longer-lever strengthening, and graded return to work or sport.
+
+Both pathways use symptom-guided load management, daily-life pain tracking, and an always-available flare phase. The content is general education, not a diagnosis or individualized medical plan. Persistent symptoms, loss of function, or possible neurologic symptoms need assessment by a qualified clinician.
 
 ## Deploy to GitHub Pages (free, takes 5 min)
 
@@ -32,7 +35,17 @@ The protocol uses staged hip- and knee-targeted strengthening, symptom-guided lo
 - It now works like a native app, including offline
 
 ## Data
-All your session data is stored locally on your phone via localStorage. It stays on your device — nothing is sent anywhere. On first load, this PFPS rewrite permanently removes the prior misdiagnosis-era history and starts fresh under `rehab-pfps-v1`. After that one-time reset, new PFPS sessions persist normally. If you clear browser data, you lose those sessions.
+All your session data is stored locally on your phone via localStorage. It stays on your device — nothing is sent anywhere. Existing PFPS knee progress remains under `rehab-pfps-v1`; the forearm track is added alongside it without resetting knee history. If you clear browser data, you lose those sessions.
+
+## Clinical basis
+
+The forearm progression was authored conservatively from current clinician-facing and patient-education sources:
+
+- [Mass General Brigham rehabilitation protocol for medial/lateral epicondylalgia](https://www.massgeneral.org/assets/MGH/pdf/orthopaedics/sports-medicine/physical-therapy/rehabilitation-protocol-for-medial-lateral-epicondylitis.pdf): pain-free active motion, early isometrics, progressive concentric/eccentric pronation-supination, and criteria-based return to function.
+- [AAOS therapeutic exercise program](https://orthoinfo.aaos.org/globalassets/pdfs/a00790_therapeutic-exercise-program-for-epicondylitis_final.pdf): staged forearm pronation/supination from supported/no weight toward longer-lever light loading, advancing only after repeated pain-stable sessions.
+- [Frimley Health NHS isometric wrist exercises](https://www.fhft.nhs.uk/patients-and-visitors/patient-information-library/isometric-wrist-exercises): clinician-reviewed blocked pronation and wrist isometrics.
+- [NCBI Bookshelf overview of pronator teres anatomy and clinical significance](https://www.ncbi.nlm.nih.gov/books/NBK580564/): distinction between local muscle symptoms and possible median-nerve involvement such as numbness, weakness, or clumsiness.
+- [University Hospitals Coventry and Warwickshire hand guidance](https://www.uhcw.nhs.uk/self-care/hand/): worsening pain, grip-affecting tingling/numbness, and urgent sudden loss of power or feeling.
 
 ## Alternative: Cloudflare Pages (also free)
 1. Go to https://pages.cloudflare.com

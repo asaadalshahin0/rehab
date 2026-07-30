@@ -1,15 +1,21 @@
 # Status
 
 ## Active Task
-In progress: replace the misdiagnosed patellar-tendinopathy and elbow programs with a knee-only patellofemoral pain syndrome protocol, validate it, and deploy it to GitHub Pages.
+In progress: add a chronic pronator teres strain forearm pathway beside the existing PFPS knee protocol, validate it, and deploy it to GitHub Pages.
 
 ## Current MVP
-Static knee-only PFPS Rehab Protocol PWA that stores progress locally in `localStorage`.
+Static PFPS knee plus chronic pronator teres forearm Rehab Protocol PWA that stores each track's progress locally in `localStorage`.
 
 ## Smallest Next Step
-Validate the PFPS protocol locally, deploy `rehab-v17-pfps`, and verify the production app.
+Validate both independent tracks locally, deploy `rehab-v18-pronator`, and verify the production app.
 
 ## Verification
+- Added a five-phase chronic pronator teres strain pathway plus an always-available forearm flare phase.
+- Kept the PFPS `KNEE_PHASES` block unchanged and preserved existing knee progress under `rehab-pfps-v1`.
+- Added track-aware dashboard, rest-day, skipped-day, detail-header, and pain-check-in labels.
+- Added conservative median-nerve and urgent-care warnings for numbness/tingling, weakness, dropping objects, loss of grip/function, sudden loss of power/feeling, deformity, major swelling, heat, or redness.
+- Grounded the forearm progression in current Mass General Brigham, AAOS, NHS hand-therapy, NCBI Bookshelf, and NHS red-flag guidance.
+- Bumped the service-worker cache to `rehab-v18-pronator`.
 - Removed all elbow UI, content, and active storage.
 - Replaced the patellar-tendinopathy exercise phases with a staged PFPS protocol using combined hip- and knee-targeted strengthening plus symptom-guided load management.
 - Made the flare phase available from every regular phase.

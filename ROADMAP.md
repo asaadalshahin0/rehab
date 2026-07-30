@@ -7,9 +7,12 @@
 - Provide a knee-only PFPS progression with combined hip and knee strengthening.
 
 ## Current Priority
-- Validate and deploy the knee-only `rehab-v17-pfps` rewrite, then verify the live GitHub Pages app.
+- Validate and deploy the dual-track `rehab-v18-pronator` build, then verify the live GitHub Pages app.
 
 ## Done
+- Added a five-phase chronic pronator teres strain pathway plus a forearm flare phase without changing the PFPS phase content.
+- Preserved existing PFPS progress and initialized forearm progress independently under the same local-only state.
+- Added track-aware UI labels and conservative neurologic/function red flags.
 - Removed the elbow track and all golfer's-elbow protocol content.
 - Replaced the patellar-tendinopathy program with four staged PFPS phases plus an always-available flare phase.
 - Added symptom-guided load rules, next-morning response guidance, and clinician-assessment warning signs.

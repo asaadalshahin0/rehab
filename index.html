@@ -81,6 +81,51 @@ const KNEE_PHASES = [
   ]},
 ];
 
+const FOREARM_PHASES = [
+  {id:1,name:"Calm & Reconnect",freq:"Use this easy session 4-5 days per week. Temporarily reduce forceful gripping, repeated screwdriver/hammer motions, heavy curls, and high-volume palm-down rotation that clearly raises symptoms.",rationale:"This educational pathway assumes a clinician has ruled out a significant tear, fracture, tendon injury, and median-nerve entrapment. Begin with comfortable forearm rotation and low-effort isometrics; chronic symptoms still need an individualized assessment if they are not improving.",warmup:"Apply comfortable warmth if it helps, then make 10 easy fists and complete 10 slow palm-up/palm-down turns with the upper arm relaxed at your side.",exercises:[
+    {name:"Supported Pronation / Supination",sets:2,reps:10,unit:"reps",rest:30,notes:"Rest the forearm on a table with the elbow bent about 90°. Slowly turn the palm up, then down, staying inside a comfortable range.",pain:pr("Pain-free or mild ≤2/10","Stop for sharp pain, tingling, numbness, or a clear loss of motion.")},
+    {name:"Gentle Pronation Isometric",sets:5,reps:1,holdSec:10,unit:"hold",rest:30,notes:"Start thumb-up. Try to turn the palm down while the other hand blocks all movement. Use about 20-30% effort.",pain:pr("Mild effort without symptom spread","Reduce effort or stop if pain rises during the hold or lingers afterward.")},
+    {name:"Gentle Wrist-Flexion Isometric",sets:4,reps:1,holdSec:10,unit:"hold",rest:30,notes:"Forearm supported, palm up. Try to bend the wrist while the other hand prevents movement. Keep the fingers relaxed.",pain:pr("0-2/10","Stop if pain becomes sharp or travels into the hand.")},
+    {name:"Scapular Set",sets:3,reps:10,unit:"reps",rest:30,notes:"Sit or stand tall. Gently draw the shoulder blade back and down without shrugging; relax fully between reps.",pain:pr("Pain-free","Use less effort if the neck or forearm tenses.")},
+  ]},
+  {id:2,name:"Supported Strength",freq:"Strength 3 days per week with a recovery day between sessions. Start with no external weight; progress only when the session and next morning remain stable.",rationale:"Supported forearm work shortens the lever and makes pronation load easier to control. The goal is quiet, repeatable movement—not testing maximum strength.",warmup:"Complete 10 supported palm-up/palm-down turns, then 3 gentle 10-second pronation isometrics.",exercises:[
+    {name:"Supported Band Pronation",sets:3,reps:10,unit:"reps",rest:45,notes:"Elbow bent about 90° and forearm supported. Start palm-up or thumb-up and rotate toward palm-down against a very light band. Return slowly.",pain:pr("0-2/10 and baseline by next morning","Use a lighter band or smaller range if symptoms rise.")},
+    {name:"Short-Lever Hammer Rotation",sets:3,reps:10,unit:"reps",rest:45,notes:"Hold an unweighted hammer close to the head, forearm supported. Slowly rotate palm up and down. Move the grip farther from the head only after this is easy.",pain:pr("Controlled and ≤2/10","Stop if the wrist bends, the upper arm twists, or symptoms spread into the hand.")},
+    {name:"Light Wrist Flexion",sets:3,reps:12,unit:"reps",rest:45,notes:"Forearm supported, palm up. Use no weight or a very light weight; lift for 2 seconds and lower for 3 seconds.",pain:pr("0-2/10","Return to the isometric version if discomfort increases afterward.")},
+    {name:"Gentle Grip Squeeze",sets:3,reps:10,holdSec:3,unit:"reps",rest:30,notes:"Squeeze a soft towel or ball at about half effort. Keep the wrist neutral and shoulder relaxed.",pain:pr("Comfortable, no symptom spread","Stop if grip triggers tingling, numbness, or hand weakness.")},
+  ]},
+  {id:3,name:"Progressive Rotation",freq:"Strength 3 days per week. Increase only one variable at a time: repetitions, then lever length, then a small amount of resistance.",rationale:"Both lowering and lifting phases build capacity. AAOS guidance progresses forearm rotation from no weight to light weights only after repeated sessions do not increase pain.",warmup:"10 easy forearm rotations, 8 wrist curls with no weight, then 2 light pronation isometrics.",exercises:[
+    {name:"Supported Pronation / Supination Load",sets:3,reps:12,unit:"reps",rest:60,notes:"Use a light hammer or 1 lb weight with the elbow bent and forearm supported. Rotate slowly through a comfortable range.",pain:pr("0-3/10 and no next-day increase","Shorten the lever or remove weight if control or symptoms worsen.")},
+    {name:"Eccentric Pronation",sets:3,reps:8,unit:"reps",rest:60,notes:"Use the other hand to help return toward palm-up. With the working arm, lower slowly toward palm-down for 4 seconds.",pain:pr("Mild, controlled ≤3/10","Stop for sharp pain, shaking loss of control, or symptoms that linger into the next morning.")},
+    {name:"Wrist Flexion + Extension",sets:3,reps:12,unit:"reps each",rest:45,notes:"Forearm supported. Use a light weight and complete slow wrist curls palm-up, then palm-down.",pain:pr("0-2/10","Reduce weight or range if forearm pain rises.")},
+    {name:"Light Band Row",sets:3,reps:12,unit:"reps",rest:45,notes:"Keep the wrist neutral and pull the elbows back without forceful gripping. Use a light loop or handles.",pain:pr("Pain-free or mild ≤2/10","Use less band tension if gripping or rotation symptoms appear.")},
+  ]},
+  {id:4,name:"Long-Lever Capacity",freq:"Strength 2-3 days per week. Keep heavy work, racquet sport, throwing, or tool use steady while this phase is progressing.",rationale:"A slightly straighter arm and less support increase the demand on the pronator teres. Advance only after supported loading is comfortable and normal daily tasks are not worse afterward.",warmup:"10 supported rotations, 8 light hammer rotations, then 10 easy band rows.",exercises:[
+    {name:"Longer-Lever Forearm Rotation",sets:3,reps:10,unit:"reps",rest:60,notes:"Support the arm with the elbow only slightly bent. Use no weight first, then the lightest weight that stays controlled.",pain:pr("0-3/10 with no next-day increase","Return to the bent-elbow supported version if pain or control worsens.")},
+    {name:"Band Pronation — Slight Elbow Bend",sets:3,reps:10,unit:"reps",rest:60,notes:"Keep the wrist straight and upper arm quiet. Rotate against a light band with the elbow slightly bent rather than fully supported.",pain:pr("Smooth and ≤3/10","Reduce tension or range if the forearm tightens sharply.")},
+    {name:"Suitcase Carry",sets:3,duration:30,unit:"sec",rest:60,notes:"Carry a light weight at your side with a neutral wrist and relaxed shoulder. Grip only firmly enough to control it.",pain:pr("No symptom spread; ≤2/10","Stop if grip fades, objects feel unsafe, or numbness/tingling appears.")},
+    {name:"Wall Push-Up",sets:3,reps:10,unit:"reps",rest:45,notes:"Hands at shoulder height, wrists comfortable. Keep the movement slow and avoid locking the elbows hard.",pain:pr("Pain-free or mild ≤2/10","Move closer to the wall or stop if forearm symptoms rise.")},
+  ]},
+  {id:5,name:"Return to Demand",freq:"Keep strength work 2-3 days per week. Reintroduce work, tools, lifting, racquet sport, or throwing in short intervals; increase duration before force or speed.",rationale:"Return is based on function, not a calendar date. Aim for full comfortable rotation, stable next-day symptoms, and grip/pronation capacity approaching the other side before normal high-force or repetitive use.",warmup:"5 minutes of general movement, 10 forearm rotations, 8 light pronation reps, and 10 easy grip squeezes.",exercises:[
+    {name:"Position-Varied Pronation",sets:3,reps:8,unit:"reps/position",rest:60,notes:"Use a light band in two positions: elbow bent at your side, then slightly straighter. Keep the wrist neutral and motion controlled.",pain:pr("0-3/10 and stable next morning","Return to one supported position if symptoms rise.")},
+    {name:"Carry + Grip Capacity",sets:3,duration:45,unit:"sec",rest:75,notes:"Use a manageable suitcase carry. Keep grip steady without white-knuckling or compensating at the shoulder.",pain:pr("No weakness or symptom spread","Stop if grip fades unexpectedly or you feel unsafe holding the load.")},
+    {name:"Task-Specific Rotation",sets:3,reps:8,unit:"reps",rest:60,notes:"Practice the exact pattern you need—light tool turns, racquet shadow swings, pouring, or controlled throwing setup—at low force and speed.",pain:pr("0-3/10, controlled, no next-day increase","Cut volume by 20-30% if symptoms linger; do not push through neurologic symptoms.")},
+    {name:"Graded Work / Sport Exposure",sets:1,duration:600,unit:"sec",rest:0,notes:"Begin around half your usual duration at easy effort. After two stable exposures, add a little time; add force or speed later.",pain:pr("Symptoms remain mild and return to baseline by next morning","Stop and regress if pain climbs, function drops, or recovery takes longer than 24 hours.")},
+  ]},
+  {id:6,name:"If Forearm Pain Flares",flarePhase:true,freq:"Use this phase when forearm symptoms rise above baseline or remain elevated the next morning. Reduce the provoking dose for several days, but keep comfortable motion.",rationale:"A flare calls for a temporary reduction in load, not a strength test. If the flare includes numbness, tingling, hand weakness, dropping objects, or loss of thumb/index pinch, stop this pathway and seek clinical assessment.",warmup:"Make 10 easy fists and complete 10 slow, unloaded palm-up/palm-down turns in the most comfortable range.",exercises:[
+    {name:"Easy Supported Rotation",sets:2,reps:8,unit:"reps",rest:30,notes:"Forearm supported, elbow bent. Move slowly between palm-up and palm-down without forcing the end range.",pain:pr("0-2/10","Stop for sharp pain or any neurologic symptom.")},
+    {name:"Low-Effort Pronation Isometric",sets:4,reps:1,holdSec:8,unit:"hold",rest:30,notes:"Use the other hand to block movement and press at only 20% effort.",pain:pr("Comfortable and local","Stop if pain spreads or remains higher after the session.")},
+    {name:"Soft Towel Squeeze",sets:2,reps:10,holdSec:2,unit:"reps",rest:30,notes:"Use a soft towel and light effort with the wrist neutral.",pain:pr("Pain-free","Stop if grip feels weak, clumsy, numb, or tingly.")},
+    {name:"Scapular Set",sets:2,reps:10,unit:"reps",rest:30,notes:"Gently draw the shoulder blade back and down without tensing the forearm.",pain:pr("Pain-free","Use less effort if the forearm tightens.")},
+  ]},
+];
+
+const TRACKS = [
+  {key:"knee",label:"Right Knee",shortLabel:"Knee",sub:"Patellofemoral Pain Syndrome",icon:"🦵",ph:KNEE_PHASES},
+  {key:"forearm",label:"Right Forearm",shortLabel:"Forearm",sub:"Chronic Pronator Teres Strain",icon:"💪",ph:FOREARM_PHASES},
+];
+const getTrackMeta = key => TRACKS.find(t=>t.key===key)||TRACKS[0];
+
 // Storage
 function loadState(){try{
   const resetKey="rehab-pfps-reset-2026-07-29";
@@ -90,8 +135,9 @@ function loadState(){try{
     localStorage.setItem(resetKey,"done");
   }
   const d=localStorage.getItem("rehab-pfps-v1");
-  return d?JSON.parse(d):{knee:{phase:1,sessions:[]}};
-}catch{return{knee:{phase:1,sessions:[]}};}}
+  const parsed=d?JSON.parse(d):{};
+  return {...parsed,knee:parsed.knee||{phase:1,sessions:[]},forearm:parsed.forearm||{phase:1,sessions:[]}};
+}catch{return{knee:{phase:1,sessions:[]},forearm:{phase:1,sessions:[]}};}}
 function saveState(s){try{localStorage.setItem("rehab-pfps-v1",JSON.stringify(s));}catch(e){console.error(e);}}
 
 // ── SFX ──
@@ -313,7 +359,7 @@ function SkipDayCheckin({tracks,onSubmit,onDismiss}){
       <div style={{fontSize:11,color:"rgba(96,165,250,0.5)",fontFamily:"'Fira Code',monospace",marginBottom:20}}>Can't remember? Hit Skip on that one.</div>
       {tracks.map(t=><div key={t} style={{marginBottom:16,opacity:skipped[t]?0.35:1,transition:"opacity 0.2s"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-          <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)"}}>🦵 Knee — daily life yesterday</div>
+          <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)"}}>{getTrackMeta(t).icon} {getTrackMeta(t).shortLabel} — daily life yesterday</div>
           <button onClick={()=>toggleSkip(t)} style={{background:skipped[t]?"rgba(96,165,250,0.12)":"rgba(255,255,255,0.04)",border:skipped[t]?"1px solid rgba(96,165,250,0.3)":"1px solid rgba(255,255,255,0.05)",color:skipped[t]?"rgba(96,165,250,0.8)":"rgba(255,255,255,0.25)",borderRadius:7,padding:"3px 9px",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>
             {skipped[t]?"skipped":"skip"}
           </button>
@@ -331,11 +377,12 @@ function SkipDayCheckin({tracks,onSubmit,onDismiss}){
 // ── Rest Day Modal ──
 function RestDayModal({track,onSubmit,onDismiss}){
   const[pain,setPain]=useState(3);
+  const meta=getTrackMeta(track);
   return(<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16,animation:"fadeIn 0.3s ease"}}>
     <div style={{background:"#111118",border:"1.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px",maxWidth:340,width:"100%"}}>
-      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>🦵 Knee Rest Day</div>
+      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>{meta.icon} {meta.shortLabel} Rest Day</div>
       <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:20}}>Logging this now while it's fresh means no guessing tomorrow.</div>
-      <PainSlider value={pain} onChange={setPain} label="Daily life pain — right now" sub="How does your knee feel with normal daily activity?"/>
+      <PainSlider value={pain} onChange={setPain} label="Daily life pain — right now" sub={`How does your ${meta.shortLabel.toLowerCase()} feel with normal daily activity?`}/>
       <div style={{display:"flex",gap:8,marginTop:16}}>
         <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancel</button>
         <button onClick={()=>onSubmit(track,pain)} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Rest Day</button>
@@ -365,7 +412,7 @@ function App(){
   useEffect(()=>{
     const st=loadState();
     const missed=[];
-    ["knee"].forEach(t=>{
+    TRACKS.map(t=>t.key).forEach(t=>{
       const s=st[t].sessions;
       if(s.length===0)return;
       const hadYesterday=s.some(x=>x.date===YESTERDAY());
@@ -424,7 +471,8 @@ function App(){
     setEditPainLog(null);
   },[state,persist]);
 
-  const phases=KNEE_PHASES;
+  const trackMeta=getTrackMeta(track);
+  const phases=trackMeta.ph;
   const ts=track?state[track]:null;
   const regularPhaseCount=phases.filter(p=>!p.flarePhase).length;
   const activePhaseId=vPhase||ts?.phase;
@@ -474,11 +522,11 @@ function App(){
       {showBreakdown&&<PainBreakdownModal sessions={showBreakdown} onClose={()=>setShowBreakdown(null)} onEdit={s=>{setShowBreakdown(null);setEditPainLog(s);}} threshold={DAILY_PAIN_THRESHOLD} pc={pc}/>}
       {editPainLog&&<PainLogEditModal entry={editPainLog} onSave={handlePainLogSave} onClose={()=>setEditPainLog(null)} pc={pc}/>}
       <div style={{padding:"44px 0 20px",animation:"fadeIn 0.35s ease"}}>
-        <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:8}}>PFPS Rehab Protocol <span style={{opacity:0.4}}>build 2026-07-29</span></div>
-        <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Knee Recovery</h1>
+        <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:8}}>Rehab Protocol <span style={{opacity:0.4}}>build 2026-07-30</span></div>
+        <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Recovery</h1>
         <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginTop:6}}>{new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
       </div>
-      {[{key:"knee",label:"Right Knee",sub:"Patellofemoral Pain Syndrome",icon:"🦵",ph:KNEE_PHASES}].map((t,ti)=>{
+      {TRACKS.map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const regCount=t.ph.filter(p=>!p.flarePhase).length;
         const ps=withRefs(d.sessions,t.key).filter(s=>s.phase===d.phase);
@@ -506,7 +554,7 @@ function App(){
       </div>
       <div style={{marginTop:10,padding:16,background:"rgba(239,68,68,0.025)",borderRadius:14,border:"1px solid rgba(239,68,68,0.07)"}}>
         <div style={{fontSize:10,fontWeight:700,color:"rgba(248,113,113,0.65)",textTransform:"uppercase",letterSpacing:0.8,marginBottom:6}}>Get assessed promptly if</div>
-        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>The knee locks, gives way repeatedly, swells substantially, cannot bear weight, follows a major injury, or pain is severe or worsening despite reducing load. This tracker supports—not replaces—an individualized clinician assessment.</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}><strong style={{color:"rgba(255,255,255,0.42)"}}>Knee:</strong> The knee locks, gives way repeatedly, swells substantially, cannot bear weight, follows a major injury, or pain is severe or worsening despite reducing load.<br/><strong style={{color:"rgba(255,255,255,0.42)"}}>Forearm:</strong> New or worsening numbness/tingling, hand or thumb/index weakness, dropping objects, loss of grip or function, major swelling/deformity, redness/heat, or severe/worsening pain needs clinical review; sudden loss of power or feeling needs urgent care. This tracker supports—not replaces—an individualized clinician assessment.</div>
       </div>
     </div>);
   }
@@ -525,7 +573,7 @@ function App(){
 
     <div style={{padding:"18px 0 10px",display:"flex",alignItems:"center",gap:12,animation:"fadeIn 0.25s ease"}}>
       <button onClick={()=>history.back()} style={{background:"rgba(255,255,255,0.04)",border:"none",color:"#fff",width:34,height:34,borderRadius:9,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>←</button>
-      <div><div style={{fontSize:16,fontWeight:700}}>🦵 Right Knee</div><div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>Patellofemoral Pain Syndrome</div></div>
+      <div><div style={{fontSize:16,fontWeight:700}}>{trackMeta.icon} {trackMeta.label}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>{trackMeta.sub}</div></div>
     </div>
 
     <TL total={regularPhaseCount} cur={Math.min(ts.phase,regularPhaseCount)}/>
@@ -539,6 +587,7 @@ function App(){
     <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:16,padding:18,marginBottom:14,animation:"fadeIn 0.3s ease"}}>
       <div style={{fontSize:15,fontWeight:700}}>{dispPhase?.flarePhase?"Pain Return Phase":`Phase ${dispPhase?.id}`}: {dispPhase?.name}</div>
       <div style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:6,lineHeight:1.6,borderLeft:"2px solid rgba(255,255,255,0.05)",paddingLeft:12}}>{dispPhase?.rationale}</div>
+      {track==="forearm"&&<div style={{fontSize:11,color:"rgba(248,113,113,0.7)",lineHeight:1.55,marginTop:10,padding:"9px 11px",background:"rgba(239,68,68,0.035)",border:"1px solid rgba(239,68,68,0.08)",borderRadius:9}}>Stop this pathway and seek assessment for numbness/tingling into the hand, new grip or pinch weakness, dropping objects, visible muscle loss, or worsening loss of function. Sudden loss of power or feeling, major deformity/swelling, or a hot red swollen arm needs urgent care.</div>}
       <div style={{display:"flex",alignItems:"flex-start",gap:8,marginTop:12,padding:"10px 12px",background:"rgba(96,165,250,0.04)",border:"1px solid rgba(96,165,250,0.08)",borderRadius:10}}><span style={{fontSize:14,flexShrink:0}}>📅</span><div style={{fontSize:12,color:"rgba(147,197,253,0.7)",lineHeight:1.5}}>{dispPhase?.freq}</div></div>
       {isCur&&<>
         <div style={{display:"flex",gap:7,marginTop:14}}>
@@ -576,7 +625,7 @@ function App(){
         <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:16,padding:18,marginBottom:12}}>
           <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>Post-Session Check-In</div>
           <PainSlider value={sPain} onChange={setSPain} label="During the exercises" sub="How much did it hurt? (tracked but doesn't gate you)"/>
-          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub="How does your knee feel with normal daily activity? This gates progression."/>
+          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub={`How does your ${trackMeta.shortLabel.toLowerCase()} feel with normal daily activity? This gates progression.`}/>
           <div style={{marginTop:4}}>
             <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.45)",marginBottom:4}}>Notes <span style={{fontWeight:400,color:"rgba(255,255,255,0.18)"}}>(optional)</span></div>
             <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anything notable?" rows={2} style={{width:"100%",padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13,resize:"vertical",outline:"none"}}/>

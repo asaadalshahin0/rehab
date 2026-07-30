@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rehab-v17-pfps';
+const CACHE_NAME = 'rehab-v18-pronator';
 const ASSETS = [
   '/rehab/',
   '/rehab/index.html',
