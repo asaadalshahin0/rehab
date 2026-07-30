@@ -1,6 +1,8 @@
 # Rehab Protocol PWA
 
-Your patellar tendinopathy + golfer's elbow rehab tracker.
+Knee-only patellofemoral pain syndrome (PFPS) rehab tracker.
+
+The protocol uses staged hip- and knee-targeted strengthening, symptom-guided load management, daily-life pain tracking, and a flare option available from every phase. It is educational support and does not replace an individualized assessment by a physical therapist or other qualified clinician.
 
 ## Deploy to GitHub Pages (free, takes 5 min)
 
@@ -30,7 +32,7 @@ Your patellar tendinopathy + golfer's elbow rehab tracker.
 - It now works like a native app, including offline
 
 ## Data
-All your session data is stored locally on your phone via localStorage. It stays on your device — nothing is sent anywhere. If you clear browser data, you lose your sessions, so don't do that.
+All your session data is stored locally on your phone via localStorage. It stays on your device — nothing is sent anywhere. On first load, this PFPS rewrite permanently removes the prior misdiagnosis-era history and starts fresh under `rehab-pfps-v1`. After that one-time reset, new PFPS sessions persist normally. If you clear browser data, you lose those sessions.
 
 ## Alternative: Cloudflare Pages (also free)
 1. Go to https://pages.cloudflare.com

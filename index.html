@@ -43,100 +43,56 @@ const YESTERDAY = () => { const d=new Date(); d.setDate(d.getDate()-1); return d
 const pr = (ok, stop) => ({ok, stop});
 
 const KNEE_PHASES = [
-  {id:1,name:"Isometric Foundation",freq:"Daily is fine — isometrics are low-stress on the tendon.",rationale:"Isometrics reduce tendon pain acutely and build baseline capacity without aggravating the tendon. You've had this 10 years — we're not rushing.",warmup:"2-3 min easy walking or marching in place. Get blood flowing to the knee.",exercises:[
-    {name:"Wall Sit",sets:3,duration:45,unit:"sec",rest:60,notes:"Back flat, knees ~70-80°. Adjust depth to manage pain.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce knee bend angle next time.")},
-    {name:"Couch Stretch",sets:2,duration:45,unit:"sec/side",rest:30,notes:"Rear foot elevated, squeeze glute on stretch side.",pain:pr("0-2/10 stretch sensation","Stop if sharp pain. Back off depth.")},
-    {name:"Glute Bridge",sets:2,reps:12,holdSec:2,unit:"reps",rest:60,notes:"2-sec squeeze at top. Glutes protect the knee.",pain:pr("0-1/10 in knee","Should be pain-free. If knee hurts, check foot placement.")},
-    {name:"Mini Squat",sets:1,reps:5,unit:"reps",rest:0,notes:"Barely a quarter squat. This is a pain probe, not a workout.",pain:pr("0-2/10 max","Stop the rep immediately at 2/10. Come back up.")},
+  {id:1,name:"Settle & Rebuild",freq:"Strength 3 days per week with a rest day between sessions. Keep normal activity, but temporarily reduce the depth, speed, hills, stairs, running, or jumping that clearly spikes symptoms.",rationale:"Patellofemoral pain is managed by matching kneecap-joint load to current capacity. Start with tolerable knee work plus hip strengthening; complete rest is not the goal.",warmup:"5 minutes easy walking or cycling. Use a comfortable pace and short range if the knee is irritable.",exercises:[
+    {name:"Chair Sit-to-Stand",sets:3,reps:8,unit:"reps",rest:60,notes:"Use a higher chair if needed. Knees track over the middle toes; move slowly and evenly.",pain:pr("0-3/10 and settles after","Stop if pain is sharp, rising, changes your movement, or is worse the next morning.")},
+    {name:"Bridge",sets:3,reps:10,holdSec:2,unit:"reps",rest:45,notes:"Squeeze glutes for 2 seconds at the top. Keep ribs down and weight even through both feet.",pain:pr("0-2/10 at the knee","Shorten the range or move the feet if the knee is irritated.")},
+    {name:"Side-Lying Hip Abduction",sets:3,reps:10,unit:"reps/side",rest:45,notes:"Top leg straight and slightly behind you; keep the pelvis stacked instead of rolling back.",pain:pr("Pain-free at the knee","Stop if it reproduces knee pain; check position before adding resistance.")},
+    {name:"Standing Calf Raise",sets:3,reps:12,unit:"reps",rest:45,notes:"Use support for balance. Rise and lower under control.",pain:pr("0-2/10 at the knee","Reduce range or use both legs if symptoms rise.")},
   ]},
-  {id:2,name:"Heavy Slow Resistance",freq:"Every other day recommended. Tendons need 24-36hrs to adapt.",rationale:"HSR is the gold standard for chronic patellar tendinopathy. Slow tempo, heavier loads, building tendon capacity.",warmup:"3 min easy walking + 10 bodyweight mini squats to warm the joint.",exercises:[
-    {name:"Spanish Squat (Iso Hold)",sets:3,duration:30,unit:"sec",rest:60,notes:"NEW — Band behind knees, lean back, hold. The money exercise for patellar tendons.",pain:pr("0-4/10 acceptable","Stop the set if >4. Reduce depth or lean angle.")},
-    {name:"Leg Extension (Slow)",sets:3,reps:8,unit:"reps",rest:90,notes:"NEW — 3-sec up, 3-sec down. Light weight. Use ankle weight or band if no machine.",pain:pr("0-3/10 in tendon","Stop set if >4. Drop weight next time.")},
-    {name:"Wall Sit",sets:3,duration:60,unit:"sec",rest:60,notes:"Progressed from 45s.",pain:pr("0-4/10 acceptable","Stop set if >4. Drop back to 45s if needed.")},
-    {name:"Glute Bridge",sets:3,reps:15,holdSec:3,unit:"reps",rest:60,notes:"Added set, reps, and hold time.",pain:pr("0-1/10 in knee","Should be pain-free. Stop if knee hurts.")},
-    {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",rest:30,notes:"Progressed from 45s.",pain:pr("0-2/10 stretch sensation","Stop if sharp. Back off depth.")},
-    {name:"Half Squat",sets:2,reps:8,unit:"reps",rest:90,notes:"Upgraded from mini squat — ~45° knee bend. 3-sec lower.",pain:pr("0-3/10 during movement","Stop the rep at 3/10.")},
+  {id:2,name:"Hip + Knee Strength",freq:"3 days per week with at least one recovery day between sessions. Add load only when the current version stays within the pain rule that day and the next morning.",rationale:"The strongest consistent recommendation for patellofemoral pain is exercise targeting both the knee and posterolateral hip. This phase builds that base through a controlled, tolerable range.",warmup:"5 minutes easy walk or cycle, then 8 comfortable sit-to-stands.",exercises:[
+    {name:"Goblet Squat to Chair",sets:3,reps:10,unit:"reps",rest:75,notes:"Start bodyweight, then hold a light weight. Use the chair to standardize a pain-tolerable depth.",pain:pr("0-3/10 and back to baseline within 24 hours","Raise the chair, reduce load, or stop if pain is sharp or changes your form.")},
+    {name:"Low Step-Up",sets:3,reps:10,unit:"reps/side",rest:60,notes:"Use a 4-6 inch step. Drive through the whole foot; control the return down.",pain:pr("0-3/10","Use a lower step or hand support if pain rises.")},
+    {name:"Lateral Band Walk",sets:3,reps:10,unit:"steps/dir",rest:45,notes:"Band above the knees to start. Stay tall with toes forward and small controlled steps.",pain:pr("Pain-free or mild ≤2/10","Use a lighter band or smaller steps if the knee is irritated.")},
+    {name:"Bridge March",sets:3,reps:8,unit:"reps/side",rest:45,notes:"Hold a level bridge while slowly lifting one foot at a time. Return to a regular bridge if the pelvis rotates.",pain:pr("0-2/10 at the knee","Return to bilateral bridge if symptoms rise.")},
   ]},
-  {id:3,name:"Single-Leg Loading",freq:"Every other day. Single-leg work is demanding — recovery matters.",rationale:"Your right knee needs to handle load independently. Single-leg work exposes asymmetries and builds real-world tendon resilience.",warmup:"3 min walking + 10 half squats + 30-sec wall sit to prime the tendon.",exercises:[
-    {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",rest:60,notes:"Progressed from 30s.",pain:pr("0-4/10 acceptable","Stop set if >4.")},
-    {name:"Decline Single-Leg Squat",sets:3,reps:8,unit:"reps",rest:90,notes:"NEW — Slant board or wedge under heels. Slow 4-sec lower on right leg, push up with both.",pain:pr("0-4/10 during eccentric","Stop if >4 or if pain is sharp rather than dull.")},
-    {name:"Step-Up",sets:3,reps:10,unit:"reps/side",rest:60,notes:"NEW — Low box (6-8 in). Controlled descent. Lead with right leg.",pain:pr("0-3/10 in knee","Stop if >3. Lower the box height.")},
-    {name:"Leg Extension (Slow)",sets:3,reps:10,unit:"reps",rest:90,notes:"Increase weight. Same slow tempo.",pain:pr("0-3/10 in tendon","Stop if >4. Drop weight.")},
-    {name:"Single-Leg Glute Bridge",sets:2,reps:10,unit:"reps/side",rest:60,notes:"NEW — Progressed from bilateral.",pain:pr("0-1/10 in knee","Should be pain-free.")},
-    {name:"Couch Stretch",sets:2,duration:60,unit:"sec/side",rest:30,notes:"Maintain.",pain:pr("0-2/10 stretch","Stop if sharp.")},
+  {id:3,name:"Progressive Strength",freq:"3 days per week. Increase only one variable at a time: first reps, then range, then a small amount of load.",rationale:"PFPS generally improves as knee and hip capacity rises. This phase moves from introductory exercises to stronger squatting, stepping, and hip work without chasing pain or perfect alignment.",warmup:"5 minutes easy walk or cycle, 8 squats to a chair, then 6 low step-ups per side.",exercises:[
+    {name:"Goblet Squat",sets:3,reps:8,unit:"reps",rest:90,notes:"Use a controlled, comfortable depth. Add a light weight only after bodyweight feels steady.",pain:pr("0-3/10 and no next-day increase","Reduce depth or load if pain is sharp, rising, or lingers into the next morning.")},
+    {name:"Step-Up",sets:3,reps:10,unit:"reps/side",rest:75,notes:"Progress the step gradually from 6 inches. Control the return down instead of dropping.",pain:pr("0-3/10","Lower the step or use support if symptoms rise.")},
+    {name:"Standing Hip Abduction",sets:3,reps:12,unit:"reps/side",rest:45,notes:"Band above the knees or ankles. Stay tall and avoid leaning the trunk.",pain:pr("Pain-free or mild ≤2/10","Use a lighter band if the knee is irritated.")},
+    {name:"Bridge March",sets:3,reps:10,unit:"reps/side",rest:45,notes:"Keep the pelvis level and move slowly. Progress to single-leg bridge only when controlled.",pain:pr("0-2/10 at the knee","Return to a regular bridge if symptoms rise.")},
   ]},
-  {id:4,name:"Energy Storage & Return",freq:"Every other day for plyometrics. Strength work can be daily if tolerated.",rationale:"The patellar tendon's real job is absorbing and releasing energy. This phase rebuilds that capacity.",warmup:"5 min progressive: walk → light jog in place → 10 half squats → 10 calf raises.",exercises:[
-    {name:"Split Squat",sets:3,reps:10,unit:"reps/side",rest:90,notes:"NEW — Full depth if pain-free. Add dumbbells when ready.",pain:pr("0-3/10 during movement","Stop if >3. Reduce depth or drop weight.")},
-    {name:"Decline Single-Leg Squat",sets:3,reps:10,unit:"reps",rest:90,notes:"Add light weight if tolerated.",pain:pr("0-4/10 during eccentric","Stop if >4.")},
-    {name:"Double-Leg Pogo Hops",sets:2,reps:15,unit:"reps",rest:60,notes:"NEW — Small, quick bounces. Stiff ankle. Plyometric intro.",pain:pr("0-2/10 only","Stop immediately if >2. Plyometrics must be near pain-free.")},
-    {name:"Step-Down (Controlled)",sets:3,reps:8,unit:"reps/side",rest:60,notes:"NEW — Higher box (8-12 in). Slow lower, tap floor, push back up.",pain:pr("0-3/10 during movement","Stop if >3. Lower the box.")},
-    {name:"Lateral Band Walk",sets:2,reps:12,unit:"steps/dir",rest:45,notes:"NEW — Hip stability for knee tracking under load.",pain:pr("0-1/10 in knee","Should be pain-free.")},
-    {name:"Single-Leg Calf Raise",sets:3,reps:12,unit:"reps/side",rest:45,notes:"NEW — Calf-Achilles complex supports patellar tendon function.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
+  {id:4,name:"Single-Leg Capacity",freq:"3 days per week. Keep other high-load knee activity steady rather than increasing training and rehab at the same time.",rationale:"Single-leg strength and movement control prepare the knee for stairs, longer walks, work, and sport. The target is smooth control—not forcing the kneecap into one perfect path.",warmup:"5 minutes easy walk or cycle, 8 squats, then 6 low step-downs per side.",exercises:[
+    {name:"Supported Split Squat",sets:3,reps:8,unit:"reps/side",rest:75,notes:"Hold a counter for balance. Keep a comfortable stride and begin with a shallow range.",pain:pr("0-3/10 and no next-day increase","Shorten the range or unload with your hands if symptoms rise.")},
+    {name:"Low Step-Down",sets:3,reps:8,unit:"reps/side",rest:75,notes:"Stand on a 2-4 inch step and tap the opposite heel down slowly. Keep the pelvis level.",pain:pr("0-3/10","Lower the step or use support if pain changes your control.")},
+    {name:"Single-Leg Bridge",sets:3,reps:8,unit:"reps/side",rest:60,notes:"Keep hips level. If hamstrings cramp or the pelvis drops, use bridge march instead.",pain:pr("0-2/10 at the knee","Regress to bridge march if the knee is irritated.")},
+    {name:"Single-Leg Calf Raise",sets:3,reps:10,unit:"reps/side",rest:45,notes:"Use fingertip support and a slow full range. Use two legs if one-leg work is not controlled.",pain:pr("0-2/10 at the knee","Switch to double-leg raises if pain rises.")},
   ]},
-  {id:5,name:"Bulletproofing",freq:"2-3x per week indefinitely. This is your new normal.",rationale:"You're not 'done' — you're managing a tendon that took 10 years to get here. Think of this as brushing your teeth for your knee.",warmup:"5 min progressive: walk → jog → 10 squats → 10 pogo hops → dynamic stretching.",exercises:[
-    {name:"Spanish Squat (Iso Hold)",sets:3,duration:45,unit:"sec",rest:60,notes:"Your maintenance staple. Keep this forever.",pain:pr("0-2/10","If >2, that's your early warning. Drop back to Phase 3 for a week.")},
-    {name:"Split Squat (Weighted)",sets:3,reps:10,unit:"reps/side",rest:90,notes:"Dumbbells or barbell. Progressive overload over months.",pain:pr("0-2/10 in tendon","Stop if >2. Drop weight 20% and rebuild.")},
-    {name:"Single-Leg Pogo Hops",sets:2,reps:10,unit:"reps/side",rest:60,notes:"NEW — The ultimate patellar tendon stress test.",pain:pr("0-1/10 only","Any pain = not ready. Go back to double-leg.")},
-    {name:"Drop Jump (Low Box)",sets:2,reps:6,unit:"reps",rest:90,notes:"NEW — Step off 6-8 in box, land, immediately jump up.",pain:pr("0-1/10 on landing","Stop immediately if any tendon pain on landing.")},
-    {name:"Lateral Lunge",sets:2,reps:8,unit:"reps/side",rest:60,notes:"NEW — Trains the tendon in a different plane.",pain:pr("0-2/10","Stop if >2. Reduce depth.")},
-    {name:"Single-Leg Calf Raise",sets:3,reps:15,unit:"reps/side",rest:45,notes:"Add weight when bodyweight is easy.",pain:pr("0-1/10 in knee","Calf burn fine. Knee pain = stop.")},
+  {id:5,name:"Return to Activity",freq:"Strength 2-3 days per week. Reintroduce stairs, hills, running, jumping, or sport one variable at a time—first volume, then speed, then intensity.",rationale:"PFPS recovery is not just a pain score; it is restoring confidence and capacity for the activities that matter to you. Maintain hip and knee strength while graded exposure bridges back to normal activity.",warmup:"5-8 minutes progressive walking or cycling, then 8 squats and 6 step-downs per side in an easy range.",exercises:[
+    {name:"Loaded Squat",sets:3,reps:8,unit:"reps",rest:90,notes:"Choose a depth and load you can control. Add a small amount of weight before adding more depth if deeper flexion is sensitive.",pain:pr("0-3/10 and back to baseline by next morning","Reduce depth or load by 20-30% if symptoms linger.")},
+    {name:"Loaded Split Squat",sets:3,reps:8,unit:"reps/side",rest:90,notes:"Add light dumbbells only after bodyweight reps are smooth and within the pain rule.",pain:pr("0-3/10","Reduce depth, load, or use support if symptoms rise.")},
+    {name:"Step-Down",sets:3,reps:10,unit:"reps/side",rest:75,notes:"Progress step height gradually. Lower for 3 seconds and lightly tap the heel.",pain:pr("0-3/10","Return to the prior step height if control or pain worsens.")},
+    {name:"Graded Activity Exposure",sets:1,duration:600,unit:"sec",rest:0,notes:"Choose the activity you want back: brisk walking, stairs, hills, jogging, jumping, or sport drills. Begin around 50-60% of your usual volume and keep speed/intensity easy.",pain:pr("0-3/10 and no next-day increase","Cut the dose by 20-30% if symptoms linger; increase only one variable after two well-tolerated exposures.")},
   ]},
-  {id:6,name:"If Pain Returns",flarePhase:true,freq:"Use for 3-7 days when daily knee pain climbs above 2/10, landing feels sharp, or the next morning is worse.",rationale:"This is the reset phase: remove impact, keep tendon-safe load, and earn your way back to Phase 5 instead of guessing.",warmup:"2 min easy walking or marching. No hops, no jogging, no loaded deep knee bend in the warmup.",exercises:[
-    {name:"Spanish Squat Pain-Relief Hold",sets:4,duration:45,unit:"sec",rest:45,notes:"Band behind knees. Sit back, keep torso tall. This is the anchor exercise while pain is up.",pain:pr("0-4/10 acceptable if it settles","Stop if sharp or rising. Reduce depth or band tension.")},
-    {name:"Shallow Wall Sit",sets:3,duration:45,unit:"sec",rest:60,notes:"Stay higher than normal. The goal is calm load, not proving depth.",pain:pr("0-3/10 during hold","Stop if >3 or worse after the set.")},
-    {name:"Slow Bodyweight Split Squat",sets:2,reps:8,unit:"reps/side",rest:90,notes:"3-sec lower, shallow range. Use hands for balance. No dumbbells.",pain:pr("0-3/10, dull only","Stop if sharp, unstable, or >3.")},
-    {name:"Low Step-Up",sets:2,reps:8,unit:"reps/side",rest:60,notes:"Low box only. Smooth up, slow down. If stairs hurt today, skip depth and use a lower step.",pain:pr("0-2/10 preferred","Stop if it changes your gait or lingers.")},
-    {name:"Double-Leg Pogo Re-Test",sets:2,reps:10,unit:"reps",rest:60,notes:"Only do this when daily pain is <=2/10. Small, quiet bounces. This is the exit test back toward Phase 5.",pain:pr("0-1/10 only","Any tendon pain = stop and repeat this phase next session.")},
-  ]},
-];
-
-const ELBOW_PHASES = [
-  {id:1,name:"Pain Reduction",freq:"Daily. Do the isometrics twice a day if you can — once in your session, once later for pain relief.",rationale:"This is tendinopathy now, not inflammation. The tendon needs load to remodel, not rest. Isometric holds are the strongest evidence-based tool for acute tendinopathy pain — a single bout can reduce pain for hours. We're dosing them heavy.",warmup:"1-2 min wrist circles (both directions) + open/close fist 20 times.",exercises:[
-    {name:"Isometric Wrist Flexion Hold",sets:4,duration:40,unit:"sec",rest:45,notes:"Palm up, hold weight dead still. This is your primary pain management tool. Can repeat these 4 sets a second time later in the day.",pain:pr("0-4/10 acceptable","Stop set if >4. Drop weight or shorten hold. Some discomfort is expected — you're loading a degenerative tendon.")},
-    {name:"Wrist Flexion Eccentric",sets:2,reps:10,unit:"reps",rest:60,notes:"5lb — Lift with left hand, lower slowly over 5 sec with right. If 5lb is too much at 5/10 daily pain, start at 3lb.",pain:pr("0-4/10 during lowering","Stop if >4 or sharp. Drop weight.")},
-    {name:"Isometric Wrist Extension Hold",sets:2,duration:30,unit:"sec",rest:45,notes:"NEW — Palm down, hold weight still. Loads the other side of the tendon. Balances the flexor work.",pain:pr("0-2/10 in elbow","Stop if medial elbow flares. This should not aggravate golfer's elbow directly.")},
-  ]},
-  {id:2,name:"Load Tolerance",freq:"Daily for isometrics. Eccentric/curl work every other day.",rationale:"Increasing weight, adding volume, introducing wrist extensors.",warmup:"1-2 min wrist circles + 10 light fist squeezes + 10 finger spreads.",exercises:[
-    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 7.5lb when 5lb feels easy.",pain:pr("0-4/10 during lowering","Stop if >4.")},
-    {name:"Isometric Wrist Flexion Hold",sets:3,duration:35,unit:"sec",rest:45,notes:"Progressed from 25s.",pain:pr("0-3/10 acceptable","Stop if >3.")},
-    {name:"Reverse Wrist Curl",sets:2,reps:12,unit:"reps",rest:60,notes:"NEW — 3-5lb, palm down, slow lower.",pain:pr("0-2/10 in elbow","Stop if any medial elbow pain.")},
-    {name:"Finger Extension (Band)",sets:2,reps:15,unit:"reps",rest:30,notes:"NEW — Band around all 5 fingers, spread apart.",pain:pr("0-1/10","Should be pain-free.")},
-  ]},
-  {id:3,name:"Grip & Rotation",freq:"Every other day. Grip work taxes the tendon.",rationale:"Your elbow needs to handle gripping, twisting, and sustained holds before impact.",warmup:"2 min wrist circles + light grip squeezes + 10 pronation/supination with no weight.",exercises:[
-    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 10lb.",pain:pr("0-4/10 during lowering","Stop if >4.")},
-    {name:"Tyler Twist (FlexBar)",sets:3,reps:10,unit:"reps",rest:60,notes:"NEW — Best-studied exercise for medial epicondylitis. Green TheraBand FlexBar.",pain:pr("0-3/10 at medial elbow","Stop if >3 or sharp.")},
-    {name:"Pronation/Supination",sets:2,reps:12,unit:"reps/dir",rest:45,notes:"NEW — Hammer or offset dumbbell, rotate forearm slowly.",pain:pr("0-2/10 in elbow","Stop if >2.")},
-    {name:"Grip Squeeze Hold",sets:3,duration:20,unit:"sec",rest:45,notes:"NEW — Tennis ball or gripper. Moderate resistance.",pain:pr("0-3/10 acceptable","Stop if >3.")},
-    {name:"Reverse Wrist Curl",sets:3,reps:12,unit:"reps",rest:60,notes:"Progress to 5-8lb.",pain:pr("0-2/10 in elbow","Stop if medial elbow pain.")},
-  ]},
-  {id:4,name:"Impact Return",freq:"Every other day minimum. Impact work needs more recovery.",rationale:"Rebuilding tolerance for impact, gripping under force, and sudden loading.",warmup:"3 min: wrist circles + light shadow punching (no contact) + grip squeezes + arm swings.",exercises:[
-    {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",rest:60,notes:"Progress to red FlexBar if green is easy.",pain:pr("0-3/10 at medial elbow","Stop if >3.")},
-    {name:"Farmer's Carry",sets:3,duration:30,unit:"sec",rest:60,notes:"NEW — Moderate-heavy weight. Crush the handle.",pain:pr("0-2/10 in elbow","Grip fatigue fine — elbow pain is not.")},
-    {name:"Towel Wring",sets:2,reps:10,unit:"reps/dir",rest:45,notes:"NEW — Wet towel, wring out both directions.",pain:pr("0-3/10 acceptable","Stop if >3 or reproduces sharp impact pain.")},
-    {name:"Ball Slam",sets:2,reps:8,unit:"reps",rest:60,notes:"NEW — Light med ball (4-6lb). Overhead slam.",pain:pr("0-2/10 on impact","Stop immediately if >2 or sharp.")},
-    {name:"Pronation/Supination",sets:3,reps:12,unit:"reps/dir",rest:45,notes:"Increase weight.",pain:pr("0-2/10 in elbow","Stop if >2.")},
-    {name:"Heavy Bag Taps",sets:2,duration:20,unit:"sec",rest:45,notes:"NEW — Light open-palm taps. Not punching yet.",pain:pr("0-2/10 only","Stop immediately if >2 or sharp.")},
-  ]},
-  {id:5,name:"Full Send",freq:"2-3x per week for maintenance. Striking sessions separate.",rationale:"The elbow passed every test. Now we bridge into actual striking — controlled, progressive. This becomes your permanent maintenance.",warmup:"3-5 min: wrist circles → shadow boxing (light) → 10 Tyler Twists → grip squeezes.",exercises:[
-    {name:"Tyler Twist (FlexBar)",sets:3,reps:12,unit:"reps",rest:60,notes:"Red FlexBar. Your elbow's insurance policy.",pain:pr("0-2/10","If >2 again, that's your early warning.")},
-    {name:"Bag Work — Single Shots",sets:3,reps:10,unit:"reps",rest:60,notes:"NEW — Closed fist, 50% power. Focus on wrist alignment. 10-sec rest between shots.",pain:pr("0-1/10 on impact","Stop if any sharp pain. Drop back to open-palm taps.")},
-    {name:"Bag Work — Light Combos",sets:2,duration:30,unit:"sec",rest:60,notes:"NEW — 1-2 and 1-2-3 combos at 50-60% power. Only after singles pain-free 3+ sessions.",pain:pr("0-1/10 on impact","Any pain = stop. Go back to singles.")},
-    {name:"Farmer's Carry (Heavy)",sets:3,duration:45,unit:"sec",rest:60,notes:"Progress to heavier weight and longer holds.",pain:pr("0-1/10 in elbow","Grip fatigue fine. Elbow pain is not.")},
-    {name:"Ball Slam (Heavy)",sets:3,reps:10,unit:"reps",rest:60,notes:"Progress to 8-10lb ball. Full power slams.",pain:pr("0-1/10 in elbow","Stop if any medial elbow pain on impact.")},
-    {name:"Wrist Roller",sets:2,reps:3,unit:"full rolls",rest:60,notes:"NEW — 5-10lb. Roll up (flexion), roll down (extension).",pain:pr("0-2/10","Stop if medial elbow flares.")},
-  ]},
-  {id:6,name:"If Pain Returns",flarePhase:true,freq:"Use for 3-7 days when medial elbow pain returns with gripping, wrist flexion, ball slams, or bag impact.",rationale:"This is the reset phase: remove impact, reload the tendon slowly, and re-test grip before returning to Phase 5.",warmup:"1-2 min wrist circles, open/close fist 20 times, then 10 gentle finger spreads. No bag work in the warmup.",exercises:[
-    {name:"Isometric Wrist Flexion Hold",sets:4,duration:40,unit:"sec",rest:45,notes:"Palm up, hold weight dead still. Use a load that feels firm but controlled.",pain:pr("0-4/10 acceptable if it settles","Stop if sharp or if pain climbs during the hold.")},
-    {name:"Wrist Flexion Eccentric",sets:3,reps:10,unit:"reps",rest:60,notes:"Lift with the left hand, lower with the right over 5 seconds. Start lighter than Phase 5.",pain:pr("0-3/10 during lowering","Stop if >3 or sharp.")},
-    {name:"Isometric Wrist Extension Hold",sets:2,duration:30,unit:"sec",rest:45,notes:"Palm down, hold still. This balances the flexor work without impact.",pain:pr("0-2/10 in elbow","Stop if medial elbow flares.")},
-    {name:"Tyler Twist",sets:2,reps:10,unit:"reps",rest:60,notes:"Green FlexBar or easier. Smooth controlled reps, no grinding.",pain:pr("0-3/10 dull only","Stop if sharp or worse after the set.")},
-    {name:"Open-Palm Bag Tap Re-Test",sets:2,duration:20,unit:"sec",rest:60,notes:"Only do this when daily pain is <=2/10. Open palm, light contact, no closed-fist shots.",pain:pr("0-1/10 only","Any sharp impact pain = stop and repeat this phase next session.")},
+  {id:6,name:"If Pain Flares",flarePhase:true,freq:"Use this phase whenever symptoms rise above your normal baseline or remain elevated the next morning. Reduce the provoking activity for several days, but keep a tolerable amount of movement and strength work.",rationale:"A flare usually calls for a temporary load adjustment, not starting over. Use easier ranges and loads, then return to your prior phase when daily activity is settling and this session does not worsen the next morning.",warmup:"5 minutes very easy walking or cycling. If that increases symptoms, shorten it and use comfortable motion only.",exercises:[
+    {name:"High-Chair Sit-to-Stand",sets:3,reps:8,unit:"reps",rest:60,notes:"Raise the seat and use hands as needed. Stay in the easiest comfortable range.",pain:pr("0-2/10 preferred","Stop if pain is sharp, rising, or changes your movement.")},
+    {name:"Bridge",sets:3,reps:10,holdSec:2,unit:"reps",rest:45,notes:"Use a comfortable foot position and keep the movement smooth.",pain:pr("0-2/10 at the knee","Shorten the range or stop if symptoms increase.")},
+    {name:"Side-Lying Hip Abduction",sets:3,reps:10,unit:"reps/side",rest:45,notes:"Keep the pelvis stacked and use no band during a flare.",pain:pr("Pain-free at the knee","Stop if it reproduces knee pain.")},
+    {name:"Double-Leg Calf Raise",sets:3,reps:10,unit:"reps",rest:45,notes:"Use support and a comfortable range.",pain:pr("0-2/10 at the knee","Reduce range or stop if symptoms rise.")},
   ]},
 ];
 
 // Storage
-function loadState(){try{const d=localStorage.getItem("rehab-v3");return d?JSON.parse(d):{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}catch{return{knee:{phase:1,sessions:[]},elbow:{phase:1,sessions:[]}};}}
-function saveState(s){try{localStorage.setItem("rehab-v3",JSON.stringify(s));}catch(e){console.error(e);}}
+function loadState(){try{
+  const resetKey="rehab-pfps-reset-2026-07-29";
+  if(!localStorage.getItem(resetKey)){
+    localStorage.removeItem("rehab-v3");
+    localStorage.removeItem("rehab-pfps-v1");
+    localStorage.setItem(resetKey,"done");
+  }
+  const d=localStorage.getItem("rehab-pfps-v1");
+  return d?JSON.parse(d):{knee:{phase:1,sessions:[]}};
+}catch{return{knee:{phase:1,sessions:[]}};}}
+function saveState(s){try{localStorage.setItem("rehab-pfps-v1",JSON.stringify(s));}catch(e){console.error(e);}}
 
 // ── SFX ──
 const _sfxCtx={c:null};
@@ -357,7 +313,7 @@ function SkipDayCheckin({tracks,onSubmit,onDismiss}){
       <div style={{fontSize:11,color:"rgba(96,165,250,0.5)",fontFamily:"'Fira Code',monospace",marginBottom:20}}>Can't remember? Hit Skip on that one.</div>
       {tracks.map(t=><div key={t} style={{marginBottom:16,opacity:skipped[t]?0.35:1,transition:"opacity 0.2s"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-          <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)"}}>{t==="knee"?"🦵 Knee":"💪 Elbow"} — daily life yesterday</div>
+          <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.6)"}}>🦵 Knee — daily life yesterday</div>
           <button onClick={()=>toggleSkip(t)} style={{background:skipped[t]?"rgba(96,165,250,0.12)":"rgba(255,255,255,0.04)",border:skipped[t]?"1px solid rgba(96,165,250,0.3)":"1px solid rgba(255,255,255,0.05)",color:skipped[t]?"rgba(96,165,250,0.8)":"rgba(255,255,255,0.25)",borderRadius:7,padding:"3px 9px",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:"pointer"}}>
             {skipped[t]?"skipped":"skip"}
           </button>
@@ -377,9 +333,9 @@ function RestDayModal({track,onSubmit,onDismiss}){
   const[pain,setPain]=useState(3);
   return(<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.8)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16,animation:"fadeIn 0.3s ease"}}>
     <div style={{background:"#111118",border:"1.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px",maxWidth:340,width:"100%"}}>
-      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>{track==="knee"?"🦵 Knee":"💪 Elbow"} Rest Day</div>
+      <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>🦵 Knee Rest Day</div>
       <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.6,marginBottom:20}}>Logging this now while it's fresh means no guessing tomorrow.</div>
-      <PainSlider value={pain} onChange={setPain} label="Daily life pain — right now" sub={`How does your ${track==="knee"?"knee":"elbow"} feel doing normal things?`}/>
+      <PainSlider value={pain} onChange={setPain} label="Daily life pain — right now" sub="How does your knee feel with normal daily activity?"/>
       <div style={{display:"flex",gap:8,marginTop:16}}>
         <button onClick={onDismiss} style={{flex:1,padding:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancel</button>
         <button onClick={()=>onSubmit(track,pain)} style={{flex:2,padding:12,borderRadius:10,border:"none",background:"#22c55e",color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>Log Rest Day</button>
@@ -409,7 +365,7 @@ function App(){
   useEffect(()=>{
     const st=loadState();
     const missed=[];
-    ["knee","elbow"].forEach(t=>{
+    ["knee"].forEach(t=>{
       const s=st[t].sessions;
       if(s.length===0)return;
       const hadYesterday=s.some(x=>x.date===YESTERDAY());
@@ -468,7 +424,7 @@ function App(){
     setEditPainLog(null);
   },[state,persist]);
 
-  const phases=track==="knee"?KNEE_PHASES:ELBOW_PHASES;
+  const phases=KNEE_PHASES;
   const ts=track?state[track]:null;
   const regularPhaseCount=phases.filter(p=>!p.flarePhase).length;
   const activePhaseId=vPhase||ts?.phase;
@@ -489,7 +445,7 @@ function App(){
   // All sets checked?
   const exercises=dispPhase?.exercises||[];
   const allChecked=exercises.every((ex,ei)=>Array.from({length:ex.sets},(_,s)=>checked[`${ei}-${s}`]).every(Boolean));
-  const isCur=activePhaseId===ts?.phase||(!!dispPhase?.flarePhase&&ts?.phase>=regularPhaseCount);
+  const isCur=activePhaseId===ts?.phase||!!dispPhase?.flarePhase;
 
   const complete=()=>{
     const durSec=sessionStartRef.current?Math.round((Date.now()-sessionStartRef.current)/1000):0;
@@ -518,11 +474,11 @@ function App(){
       {showBreakdown&&<PainBreakdownModal sessions={showBreakdown} onClose={()=>setShowBreakdown(null)} onEdit={s=>{setShowBreakdown(null);setEditPainLog(s);}} threshold={DAILY_PAIN_THRESHOLD} pc={pc}/>}
       {editPainLog&&<PainLogEditModal entry={editPainLog} onSave={handlePainLogSave} onClose={()=>setEditPainLog(null)} pc={pc}/>}
       <div style={{padding:"44px 0 20px",animation:"fadeIn 0.35s ease"}}>
-        <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:8}}>Rehab Protocol <span style={{opacity:0.4}}>build 2026-05-31</span></div>
-        <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Your Recovery</h1>
+        <div style={{fontSize:10,fontFamily:"'Fira Code',monospace",color:"rgba(255,255,255,0.18)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:8}}>PFPS Rehab Protocol <span style={{opacity:0.4}}>build 2026-07-29</span></div>
+        <h1 style={{fontSize:26,fontWeight:800,lineHeight:1.15,letterSpacing:-0.5}}>Knee Recovery</h1>
         <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginTop:6}}>{new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
       </div>
-      {[{key:"knee",label:"Right Knee Bro",sub:"Patellar Tendinopathy",icon:"🦵",ph:KNEE_PHASES},{key:"elbow",label:"Right Elbow",sub:"Golfer's Elbow (Impact)",icon:"💪",ph:ELBOW_PHASES}].map((t,ti)=>{
+      {[{key:"knee",label:"Right Knee",sub:"Patellofemoral Pain Syndrome",icon:"🦵",ph:KNEE_PHASES}].map((t,ti)=>{
         const d=state[t.key],phase=t.ph.find(p=>p.id===d.phase);
         const regCount=t.ph.filter(p=>!p.flarePhase).length;
         const ps=withRefs(d.sessions,t.key).filter(s=>s.phase===d.phase);
@@ -546,7 +502,11 @@ function App(){
       })}
       <div style={{marginTop:16,padding:16,background:"rgba(255,255,255,0.012)",borderRadius:14,border:"1px solid rgba(255,255,255,0.025)"}}>
         <div style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,0.35)",textTransform:"uppercase",letterSpacing:0.8,marginBottom:6}}>Progression Rules</div>
-        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. Rest-day check-ins feed your pain average but don't count as sessions.</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>Complete <strong style={{color:"rgba(255,255,255,0.45)"}}>{SESSIONS_TO_UNLOCK} sessions</strong> with a <strong style={{color:"rgba(255,255,255,0.45)"}}>daily-life pain avg ≤ {DAILY_PAIN_THRESHOLD}/10</strong> to unlock the next phase. During exercise, keep pain mild, controlled, and back to baseline by the next morning. Rest-day check-ins feed your pain average but don't count as sessions.</div>
+      </div>
+      <div style={{marginTop:10,padding:16,background:"rgba(239,68,68,0.025)",borderRadius:14,border:"1px solid rgba(239,68,68,0.07)"}}>
+        <div style={{fontSize:10,fontWeight:700,color:"rgba(248,113,113,0.65)",textTransform:"uppercase",letterSpacing:0.8,marginBottom:6}}>Get assessed promptly if</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",lineHeight:1.7}}>The knee locks, gives way repeatedly, swells substantially, cannot bear weight, follows a major injury, or pain is severe or worsening despite reducing load. This tracker supports—not replaces—an individualized clinician assessment.</div>
       </div>
     </div>);
   }
@@ -565,13 +525,13 @@ function App(){
 
     <div style={{padding:"18px 0 10px",display:"flex",alignItems:"center",gap:12,animation:"fadeIn 0.25s ease"}}>
       <button onClick={()=>history.back()} style={{background:"rgba(255,255,255,0.04)",border:"none",color:"#fff",width:34,height:34,borderRadius:9,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>←</button>
-      <div><div style={{fontSize:16,fontWeight:700}}>{track==="knee"?"🦵 Right Knee":"💪 Right Elbow"}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>{track==="knee"?"Patellar Tendinopathy":"Golfer's Elbow (Impact)"}</div></div>
+      <div><div style={{fontSize:16,fontWeight:700}}>🦵 Right Knee</div><div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>Patellofemoral Pain Syndrome</div></div>
     </div>
 
     <TL total={regularPhaseCount} cur={Math.min(ts.phase,regularPhaseCount)}/>
 
     <div style={{display:"flex",gap:5,marginBottom:12,overflowX:"auto",paddingBottom:2}}>
-      {phases.map(p=>{const locked=p.flarePhase?ts.phase<regularPhaseCount:p.id>ts.phase,active=activePhaseId===p.id;
+      {phases.map(p=>{const locked=p.flarePhase?false:p.id>ts.phase,active=activePhaseId===p.id;
         return <button key={p.id} onClick={()=>!locked&&setVPhase(p.id)} disabled={locked} style={{padding:"5px 11px",borderRadius:7,border:"none",fontSize:10.5,fontFamily:"'Fira Code',monospace",fontWeight:700,cursor:locked?"not-allowed":"pointer",background:active?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.015)",color:locked?"rgba(255,255,255,0.08)":active?"#fff":"rgba(255,255,255,0.3)",whiteSpace:"nowrap"}}>{locked?"🔒 ":""}{p.flarePhase?"PAIN":`P${p.id}`}</button>;
       })}
     </div>
@@ -616,7 +576,7 @@ function App(){
         <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.04)",borderRadius:16,padding:18,marginBottom:12}}>
           <div style={{fontSize:14,fontWeight:700,marginBottom:14}}>Post-Session Check-In</div>
           <PainSlider value={sPain} onChange={setSPain} label="During the exercises" sub="How much did it hurt? (tracked but doesn't gate you)"/>
-          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub={`How does your ${track==="knee"?"knee":"elbow"} feel doing normal things? This gates progression.`}/>
+          <PainSlider value={dPain} onChange={setDPain} label="Daily life right now" sub="How does your knee feel with normal daily activity? This gates progression."/>
           <div style={{marginTop:4}}>
             <div style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.45)",marginBottom:4}}>Notes <span style={{fontWeight:400,color:"rgba(255,255,255,0.18)"}}>(optional)</span></div>
             <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anything notable?" rows={2} style={{width:"100%",padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13,resize:"vertical",outline:"none"}}/>

@@ -1,18 +1,20 @@
 # Status
 
 ## Active Task
-Completed: replaced the Phase 5 "If Pain Returns" text box with a selectable PAIN phase that runs like the normal exercise phases, and bumped the service-worker cache to `rehab-v16`.
+In progress: replace the misdiagnosed patellar-tendinopathy and elbow programs with a knee-only patellofemoral pain syndrome protocol, validate it, and deploy it to GitHub Pages.
 
 ## Current MVP
-Static Rehab Protocol PWA that stores knee and elbow rehab progress locally in `localStorage`.
+Static knee-only PFPS Rehab Protocol PWA that stores progress locally in `localStorage`.
 
 ## Smallest Next Step
-Push `rehab-v16` to GitHub Pages, then close/reopen the installed PWA so the PAIN phase loads.
+Validate the PFPS protocol locally, deploy `rehab-v17-pfps`, and verify the production app.
 
 ## Verification
-- Added PAIN phase exercise sets for knee and elbow with normal set checkboxes, rest timers, and session logging.
-- Verified PAIN phase sessions are tracked separately from the main Phase 5 maintenance phase.
-- Verified service-worker cache bump to `rehab-v16`.
+- Removed all elbow UI, content, and active storage.
+- Replaced the patellar-tendinopathy exercise phases with a staged PFPS protocol using combined hip- and knee-targeted strengthening plus symptom-guided load management.
+- Made the flare phase available from every regular phase.
+- Added a one-time first-load reset that deletes the old misdiagnosis-era history and starts PFPS progress at Phase 1 under `rehab-pfps-v1`.
+- Bumped the service-worker cache to `rehab-v17-pfps`.
 - Verified Babel 7.26.10 transform still avoids `react/jsx-runtime`.
 - Verified compiled output includes the `FlareCurriculum` component plus knee and elbow staged curriculum content.
 - Loaded the PWA locally at `http://127.0.0.1:4174/` and confirmed the dashboard renders into `#root` with no console errors.
