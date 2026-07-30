@@ -4,12 +4,13 @@
 - Keep the static rehab tracker usable offline.
 - Preserve local-only progress storage.
 - Let logged pain data be corrected without resetting progress.
-- Provide a knee-only PFPS progression with combined hip and knee strengthening.
+- Provide independent PFPS knee and chronic pronator teres forearm progressions.
 
 ## Current Priority
-- Validate and deploy the dual-track `rehab-v18-pronator` build, then verify the live GitHub Pages app.
+- Monitor the live dual-track build and preserve the current local-only progress model.
 
 ## Done
+- Deployed and live-verified `rehab-v18-pronator` at commit `167e7f5` through GitHub Pages workflow `30586995872`.
 - Added a five-phase chronic pronator teres strain pathway plus a forearm flare phase without changing the PFPS phase content.
 - Preserved existing PFPS progress and initialized forearm progress independently under the same local-only state.
 - Added track-aware UI labels and conservative neurologic/function red flags.

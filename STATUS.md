@@ -1,13 +1,13 @@
 # Status
 
 ## Active Task
-In progress: add a chronic pronator teres strain forearm pathway beside the existing PFPS knee protocol, validate it, and deploy it to GitHub Pages.
+Complete: the chronic pronator teres strain forearm pathway is live beside the unchanged PFPS knee protocol.
 
 ## Current MVP
 Static PFPS knee plus chronic pronator teres forearm Rehab Protocol PWA that stores each track's progress locally in `localStorage`.
 
 ## Smallest Next Step
-Validate both independent tracks locally, deploy `rehab-v18-pronator`, and verify the production app.
+Monitor real-world use and keep any future exercise or progression changes clinician-guided.
 
 ## Verification
 - Added a five-phase chronic pronator teres strain pathway plus an always-available forearm flare phase.
@@ -16,6 +16,7 @@ Validate both independent tracks locally, deploy `rehab-v18-pronator`, and verif
 - Added conservative median-nerve and urgent-care warnings for numbness/tingling, weakness, dropping objects, loss of grip/function, sudden loss of power/feeling, deformity, major swelling, heat, or redness.
 - Grounded the forearm progression in current Mass General Brigham, AAOS, NHS hand-therapy, NCBI Bookshelf, and NHS red-flag guidance.
 - Bumped the service-worker cache to `rehab-v18-pronator`.
+- Deployed commit `167e7f5` through GitHub Pages workflow `30586995872` and verified the live dashboard, Phase 1 forearm pathway, flare pathway, PFPS card, safety guidance, and new service-worker cache at `https://asaadalshahin0.github.io/rehab/`.
 - Removed all elbow UI, content, and active storage.
 - Replaced the patellar-tendinopathy exercise phases with a staged PFPS protocol using combined hip- and knee-targeted strengthening plus symptom-guided load management.
 - Made the flare phase available from every regular phase.
